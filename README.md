@@ -170,10 +170,6 @@ EV_Charge_Maroc/
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-## Screenshots 📸
-
-[Screenshots will be added here]
-
 ## Contact 📧
 
 **YASSINE ATIKI**
