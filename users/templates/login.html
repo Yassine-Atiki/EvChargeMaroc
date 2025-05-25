@@ -1,0 +1,267 @@
+{% extends 'base.html' %} {% load custom_filters %} {% block content %}
+<!DOCTYPE html>
+<html lang="fr">
+  {% load static %}
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EV Charge Maroc</title>
+    <link href="media/EV Charge Maroc LOGO.png" rel="stylesheet" />
+    <link rel="stylesheet" href="{% static 'css/login.css' %}" />
+  </head>
+  <body>
+    <main class="main-content">
+      <section class="login-container">
+        <div class="login-card">
+          <div class="login-header">
+            <img
+              src="https://cdn.builder.io/api/v1/image/assets/TEMP/42cc779b139db8de56c2eb12610cbdd39786f894"
+              alt="EV Charge Maroc Logo"
+              class="login-logo"
+            />
+            <h1 class="company-name">EV Charge Maroc</h1>
+            <h2 class="login-title">Connexion</h2>
+            <p class="login-subtitle">
+              Entrez vos identifiants pour accéder à votre compte
+            </p>
+          </div>
+
+          <!-- Bloc de messages d'erreur globaux -->
+          {% if messages %}
+            {% for message in messages %}
+              {% if message.tags == 'success' %}
+              <div class="success-container">
+                <div class="success-message">{{ message }}</div>
+              </div>
+              {% elif message.tags == 'error' %}
+              <div class="error-container">
+                <div class="error-message">{{ message }}</div>
+              </div>
+              {% elif message.tags == 'warning' %}
+              <div class="warning-container">
+                <div class="warning-message">{{ message }}</div>
+              </div>
+              {% elif message.tags == 'info' %}
+              <div class="info-container">
+                <div class="info-message">{{ message }}</div>
+              </div>
+              {% else %}
+              <div class="message-container">
+                <div class="message">{{ message }}</div>
+              </div>
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+          
+          <!-- Bloc d'erreur de formulaire -->
+          {% if form.non_field_errors %}
+          <div class="error-container">
+            {% for error in form.non_field_errors %}
+            <div class="error-message">{{ error }}</div>
+            {% endfor %}
+          </div>
+          {% endif %}
+
+          <form
+            id="login-form"
+            action="{% url 'users:login' %}"
+            method="post"
+            class="login-form"
+          >
+            {% csrf_token %}
+            <div class="account-type-selector">
+              <h4 class="selector-title">Type de compte</h4>
+              <div class="toggle-container">
+                <input type="radio" id="proprietaire" name="user_type" value="proprietaire" checked class="toggle-input" />
+                <label for="proprietaire" class="toggle-label proprietaire-label">
+                  <div class="toggle-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M5 9h14M8 4h8l2 3.5L12 10 6 7.5 8 4z"></path>
+                      <path d="M7 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"></path>
+                      <path d="M17 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"></path>
+                      <path d="M5 9v4M19 9v4"></path>
+                    </svg>
+                  </div>
+                  <span>Propriétaire</span>
+                </label>
+                
+                <input type="radio" id="fournisseur" name="user_type" value="fournisseur" class="toggle-input" />
+                <label for="fournisseur" class="toggle-label fournisseur-label">
+                  <div class="toggle-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="6" y="3" width="12" height="18" rx="2"></rect>
+                      <line x1="12" y1="7" x2="12" y2="9"></line>
+                      <line x1="12" y1="14" x2="12" y2="16"></line>
+                      <path d="M7 20l3-3h4l3 3"></path>
+                    </svg>
+                  </div>
+                  <span>Fournisseur</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="email" class="form-label">Email</label>
+              <input
+                type="email"
+                name="email"
+                id="email"
+                required
+                class="form-input {% if form.email.errors %}error{% endif %}"
+                {% if form.email.value %}value="{{ form.email.value }}"{% endif %}
+              />
+              {% if form.email.errors %}
+              <div class="field-error">
+                {% for error in form.email.errors %}
+                <p>{{ error }}</p>
+                {% endfor %}
+              </div>
+              {% endif %}
+            </div>
+
+            <div class="form-group">
+              <div class="password-header">
+                <label for="password" class="form-label">Mot de passe</label>
+                <a href="{% url 'users:password_reset' %}" class="forgot-password">Mot de passe oublié?</a>
+              </div>
+              <input
+                type="password"
+                name="password"
+                id="password"
+                minlength="8"
+                required
+                class="form-input {% if form.password.errors %}error{% endif %}"
+              />
+              {% if form.password.errors %}
+              <div class="field-error">
+                {% for error in form.password.errors %}
+                <p>{{ error }}</p>
+                {% endfor %}
+              </div>
+              {% endif %}
+            </div>
+
+            <p class="signup-prompt">
+              Vous n'avez pas de compte?
+              <a href="{% url 'users:inscription'  %}" class="signup-link"
+                >S'inscrire</a
+              >
+            </p>
+
+            <button type="submit" class="submit-button">Se connecter</button>
+            
+            {% if next %}
+            <input type="hidden" name="next" value="{{ next }}">
+            {% endif %}
+          </form>
+        </div>
+      </section>
+    </main>
+    <!-- Ajouter ceci à la fin du formulaire de connexion -->
+    <div class="admin-links">
+        <p>Vous êtes administrateur ? <a href="/admin/login/">Accéder à l'interface d'administration</a></p>
+    </div>
+
+    <style>
+        .admin-links {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+            font-size: 14px;
+            color: #666;
+            text-align: center;
+        }
+        .admin-links a {
+            color: var(--color-primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .admin-links a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Styles pour les messages d'erreur */
+        .error-container {
+            background-color: #fff5f5;
+            border-left: 4px solid #e53e3e;
+            border-radius: 4px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            color: #c53030;
+            font-size: 14px;
+        }
+        
+        .error-message {
+            margin-bottom: 6px;
+        }
+        
+        .error-message:last-child {
+            margin-bottom: 0;
+        }
+        
+        .field-error {
+            color: #e53e3e;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+        
+        .field-error p {
+            margin: 0;
+        }
+        
+        input.error {
+            border-color: #e53e3e;
+        }
+        
+        /* Style pour les messages de succès */
+        .success-container {
+            background-color: #f0fff4;
+            border-left: 4px solid #38a169;
+            border-radius: 4px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            color: #2f855a;
+            font-size: 14px;
+        }
+        
+        .success-message {
+            margin-bottom: 6px;
+        }
+        
+        .success-message:last-child {
+            margin-bottom: 0;
+        }
+        
+        /* Style pour les messages d'information */
+        .info-container {
+            background-color: #ebf8ff;
+            border-left: 4px solid #4299e1;
+            border-radius: 4px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            color: #3182ce;
+            font-size: 14px;
+        }
+        
+        .info-message {
+            margin-bottom: 6px;
+        }
+        
+        /* Style pour les messages d'avertissement */
+        .warning-container {
+            background-color: #fffaf0;
+            border-left: 4px solid #ed8936;
+            border-radius: 4px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            color: #dd6b20;
+            font-size: 14px;
+        }
+        
+        .warning-message {
+            margin-bottom: 6px;
+        }
+    </style>
+  </body>
+</html>
+{% endblock content %}

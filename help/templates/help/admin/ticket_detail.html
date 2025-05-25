@@ -1,0 +1,77 @@
+
+{% block admin_help_content %}
+<div class="help-header">
+    <a href="{% url 'help:admin_tickets' %}" class="back-link"><i class="fas fa-arrow-left"></i> Retour à la liste</a>
+    <h1 class="help-title">Ticket #{{ ticket.id }}</h1>
+    <div class="ticket-meta">
+        <span class="ticket-user">Utilisateur: {{ ticket.user.username }}</span>
+        <span class="ticket-date">Créé le {{ ticket.created_at|date:"d/m/Y H:i" }}</span>
+    </div>
+</div>
+
+<div class="ticket-container admin-ticket">
+    <div class="ticket-details">
+        <div class="ticket-header">
+            <h2 class="ticket-subject">{{ ticket.subject }}</h2>
+            <form method="post" class="status-form">
+                {% csrf_token %}
+                <div class="status-control">
+                    <label for="id_status">Statut:</label>
+                    <select name="status" id="id_status" class="form-select status-select">
+                        {% for value, label in ticket.STATUS_CHOICES %}
+                        <option value="{{ value }}" {% if ticket.status == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" name="update_status" class="btn-secondary">Mettre à jour</button>
+                </div>
+            </form>
+        </div>
+        
+        <div class="ticket-message">
+            <div class="message-header">
+                <span class="message-author">{{ ticket.user.first_name }} {{ ticket.user.last_name }}</span>
+                <span class="message-date">{{ ticket.created_at|date:"d/m/Y H:i" }}</span>
+            </div>
+            <div class="message-content">
+                {{ ticket.message|linebreaks }}
+            </div>
+        </div>
+    </div>
+    
+    <div class="ticket-responses">
+        <h3 class="responses-title">Réponses</h3>
+        
+        {% for response in responses %}
+        <div class="response-item {% if response.user.is_staff %}admin-response{% else %}user-response{% endif %}">
+            <div class="response-header">
+                <span class="response-author">{{ response.user.first_name }} {{ response.user.last_name }} {% if response.user.is_staff %}(Support){% endif %}</span>
+                <span class="response-date">{{ response.created_at|date:"d/m/Y H:i" }}</span>
+            </div>
+            <div class="response-content">
+                {{ response.message|linebreaks }}
+            </div>
+        </div>
+        {% empty %}
+        <p class="no-items">Aucune réponse pour le moment.</p>
+        {% endfor %}
+    </div>
+    
+    <div class="response-form-container">
+        <h3 class="form-title">Ajouter une réponse</h3>
+        <form method="post" class="response-form">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                {{ form.message }}
+                {% if form.message.errors %}
+                <div class="form-error">{{ form.message.errors }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn-primary">Envoyer la réponse</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

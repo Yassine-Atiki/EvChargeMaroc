@@ -1,0 +1,21 @@
+{% extends 'help/help_base.html' %} {% block help_content %}
+<div class="help-header">
+  <h1 class="help-title">Accès refusé</h1>
+  <p class="help-description">
+    Vous n'avez pas les permissions nécessaires pour accéder à cette page.
+  </p>
+</div>
+
+<div class="error-container">
+  <div class="error-icon">
+    <i class="fas fa-exclamation-triangle"></i>
+  </div>
+  <p class="error-message">
+    Cette section est réservée aux administrateurs du site. Veuillez contacter
+    un administrateur si vous avez besoin d'assistance.
+  </p>
+  <a href="{% url 'help:help_home' %}" class="btn-primary"
+    >Retour à l'accueil</a
+  >
+</div>
+{% endblock %}

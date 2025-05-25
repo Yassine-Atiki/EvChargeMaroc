@@ -1,0 +1,279 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+{% block content %}
+{% load static %}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="{% static 'css/update_stations.css'%}">
+
+<!-- Définissons l'URL de l'image de remplacement en début de template -->
+<script>
+  const placeholderImageUrl = "{% static 'images/photo-placeholder.jpg' %}";
+</script>
+
+<div class="page-container">
+  <header class="header">
+    <h1 class="header-title">Modifier la station</h1>
+    <p class="header-subtitle">Mettez à jour les informations de votre station de recharge électrique</p>
+  </header>
+
+  <div class="card">
+    <div class="card-header">
+      <h2>{{ station.nom }}</h2>
+    </div>
+    <div class="card-body">
+      <form
+        action="{% url 'stations:update_station' station.ID_Station username %}"
+        method="post"
+        enctype="multipart/form-data"
+      >
+        {% csrf_token %}
+        
+        <!-- Affichage des erreurs -->
+        {% if error %}
+        <div class="error-message">
+          {{ error.error }}
+        </div>
+        {% endif %}
+        
+        <div class="form-grid">
+          <div class="form-field">
+            <label for="nom">Nom de la station</label>
+            <div class="field-group">
+              <i class="fas fa-charging-station field-icon"></i>
+              <input
+                type="text"
+                name="nom"
+                id="nom"
+                class="field-with-icon"
+                value="{{ station.nom }}"
+                placeholder="Entrez le nom de la station"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label for="adresse">Adresse</label>
+            <div class="field-group">
+              <i class="fas fa-map-marker-alt field-icon"></i>
+              <input
+                type="text"
+                name="adresse"
+                id="adresse"
+                class="field-with-icon"
+                value="{{ station.adresse }}"
+                placeholder="Adresse complète"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label for="puissance">Puissance (kW)</label>
+            <div class="field-group">
+              <i class="fas fa-bolt field-icon"></i>
+              <input
+                type="number"
+                name="puissance"
+                id="puissance"
+                class="field-with-icon"
+                value="{{ station.puissance }}"
+                placeholder="Ex: 22"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label for="prix_kw">Prix par kW (MAD)</label>
+            <div class="field-group">
+              <i class="fas fa-tag field-icon"></i>
+              <input
+                type="number"
+                name="prix_kw"
+                id="prix_kw"
+                class="field-with-icon"
+                value="{{ station.prix_kw }}"
+                placeholder="Ex: 2.5"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="form-field">
+            <div class="switch-container">
+              <label for="disponibilite" class="switch-label">Disponibilité</label>
+              <label class="switch">
+                <input
+                  type="checkbox"
+                  name="disponibilite"
+                  id="disponibilite"
+                  value="1"
+                  {% if station.disponibilite %}checked{% endif %}
+                />
+                <span class="slider"></span>
+              </label>
+            </div>
+            <div class="toggle-labels">
+              <span>Indisponible</span>
+              <span>Disponible</span>
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label for="connector_types">Types de connecteurs</label>
+            <div class="field-group">
+              <i class="fas fa-plug field-icon"></i>
+              <select
+                name="connector_types"
+                id="connector_types"
+                class="field-with-icon">
+                <option value="SAE J1772"{% if station.connector_types == "SAE J1772" %}selected{% endif %}>SAE J1772</option>
+                <option value="Mennekes"{% if station.connector_types == "Mennekes" %}selected{% endif %}>Mennekes</option>
+                <option value="Scame"{% if station.connector_types == "Scame" %}selected{% endif %}>Scame</option>
+                <option value="CHAdeMO"{% if station.connector_types == "CHAdeMO" %}selected{% endif %}>CHAdeMO</option>
+                <option value="Combo 1"{% if station.connector_types == "Combo 1" %}selected{% endif %}>Combo 1</option>
+                <option value="Combo 2"{% if station.connector_types == "Combo 2" %}selected{% endif %}>Combo 2</option>
+                <option value="Tesla"{% if station.connector_types == "Tesla" %}selected{% endif %}>Tesla</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label for="latitude">Latitude</label>
+            <div class="field-group">
+              <i class="fas fa-location-arrow field-icon"></i>
+              <input
+                type="text"
+                name="latitude"
+                id="latitude"
+                class="field-with-icon"
+                value="{{ station.latitude }}"
+                placeholder="Ex: 33.589886"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label for="longitude">Longitude</label>
+            <div class="field-group">
+              <i class="fas fa-location-arrow field-icon"></i>
+              <input
+                type="text"
+                name="longitude"
+                id="longitude"
+                class="field-with-icon"
+                value="{{ station.longitude }}"
+                placeholder="Ex: -7.603869"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label for="power">Puissance détaillée</label>
+            <div class="field-group">
+              <i class="fas fa-bolt field-icon"></i>
+              <input
+                type="text"
+                name="power"
+                id="power"
+                class="field-with-icon"
+                value="{{ station.power }}"
+                placeholder="Ex: 22kW AC / 50kW DC"
+              />
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label for="operator">Opérateur</label>
+            <div class="field-group">
+              <i class="fas fa-building field-icon"></i>
+              <input
+                type="text"
+                name="operator"
+                id="operator"
+                class="field-with-icon"
+                value="{{ station.operator }}"
+                placeholder="Ex: Total Energies"
+              />
+            </div>
+          </div>
+
+          <div class="form-field full-width">
+            <label>Photos actuelles</label>
+            <div class="photos-gallery">
+              {% for photo in station.photos.all %}
+              <div class="photo-item">
+                <img src="{{ photo.image.url }}" alt="Photo de la station {{ station.nom }}" class="station-photo">
+                <div class="photo-overlay">
+                  <a href="{% url 'stations:delete_photo' station.ID_Station photo.id username %}" class="delete-photo">
+                    <i class="fas fa-trash"></i> Supprimer
+                  </a>
+                </div>
+              </div>
+              {% empty %}
+              <p>Aucune photo pour cette station.</p>
+              {% endfor %}
+            </div>
+          </div>
+
+          <div class="form-field full-width">
+            <label for="photos">Ajouter des photos</label>
+            <label for="photos" class="file-upload-container">
+              <div class="file-upload-icon">
+                <i class="fas fa-cloud-upload-alt"></i>
+              </div>
+              <div class="file-upload-text">
+                Glissez et déposez des images ici ou
+              </div>
+              <span class="file-browse-btn">Parcourir les fichiers</span>
+              <input type="file" name="photos[]" id="photos" multiple accept="image/*" />
+            </label>
+          </div>
+        </div>
+
+        <div class="btn-container">
+          <button type="button" class="btn btn-secondary" onclick="window.history.back();">
+            <i class="fas fa-arrow-left"></i> Annuler
+          </button>
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save"></i> Mettre à jour
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Toast de succès (caché par défaut) -->
+<div class="toast" id="successToast">
+  <i class="fas fa-check-circle"></i>
+  <span>La station a été mise à jour avec succès!</span>
+</div>
+
+<!-- Script pour gérer l'affichage conditionnel du toast -->
+<script>
+  // Cette fonction serait appelée après une mise à jour réussie
+  function showSuccessToast() {
+    const toast = document.getElementById('successToast');
+    toast.classList.add('show');
+    setTimeout(() => {
+      toast.classList.remove('show');
+    }, 3000);
+  }
+  
+  // Gestionnaire d'erreur pour les images
+  document.addEventListener('DOMContentLoaded', function() {
+    const stationPhotos = document.querySelectorAll('.station-photo');
+    stationPhotos.forEach(function(img) {
+      img.onerror = function() {
+        this.src = placeholderImageUrl;
+        this.onerror = null;
+      };
+    });
+  });
+</script>
+{% endblock content %}

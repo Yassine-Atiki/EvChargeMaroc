@@ -1,0 +1,187 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+{% block content %}
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'css/add_list_fournisseur.css'%}" />
+
+<!-- Définissons l'URL de l'image de remplacement en début de template -->
+<script>
+  const placeholderImageUrl = "{% static 'images/photo-placeholder.jpg' %}";
+</script>
+
+<form action="{% url 'stations:add_station' username %}" method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+
+  <!-- Afficher les messages d'erreur s'il y en a -->
+  {% if error %}
+  <div class="error-message">
+    {{ error.error }}
+  </div>
+  {% endif %}
+
+  <div class="form-header">
+    <h1 class="form-title">Ajouter une nouvelle station</h1>
+    <p class="form-subtitle">
+      Remplissez les informations ci-dessous pour enregistrer votre station
+    </p>
+  </div>
+
+  <div class="form-grid">
+    <div class="form-field">
+      <label for="nom">Nom de la station</label>
+      <input
+        type="text"
+        name="nom"
+        id="nom"
+        required
+        placeholder="Ex: Station Centre-ville"
+      />
+    </div>
+
+    <div class="form-field">
+      <label for="operator">Opérateur</label>
+      <input
+        type="text"
+        name="operator"
+        id="operator"
+        placeholder="Ex: EcoDrive"
+      />
+    </div>
+
+    <div class="form-field">
+      <label for="adresse">Adresse</label>
+      <input
+        type="text"
+        name="adresse"
+        id="adresse"
+        required
+        placeholder="Ex: 123 Rue Mohammed V"
+      />
+    </div>
+
+    <div class="form-field">
+      <label for="connector_types">Types de connecteurs</label>
+      <select name="connector_types" id="connector_types" class="custom-select">
+        <option value="" disabled selected>Sélectionnez un type de connecteur</option>
+        <option value="SAE J1772">SAE J1772</option>
+        <option value="Mennekes">Mennekes</option>
+        <option value="Scame">Scame</option>
+        <option value="CHAdeMO">CHAdeMO</option>
+        <option value="Combo 1">Combo 1</option>
+        <option value="Combo 2">Combo 2</option>
+        <option value="Tesla">Tesla</option>
+      </select>
+    </div>
+
+    <div class="form-field">
+      <label for="puissance">Puissance (kW)</label>
+      <div class="input-with-icon">
+        <input
+          type="number"
+          name="puissance"
+          id="puissance"
+          required
+          placeholder="Ex: 50"
+        />
+        <span class="input-icon">kW</span>
+      </div>
+    </div>
+
+    <div class="form-field">
+      <label for="prix_kw">Prix par kW</label>
+      <div class="input-with-icon">
+        <input
+          type="number"
+          name="prix_kw"
+          id="prix_kw"
+          required
+          placeholder="Ex: 2.5"
+          step="0.01"
+        />
+        <span class="input-icon">DH</span>
+      </div>
+    </div>
+
+    <div class="form-field">
+      <label for="latitude">Latitude</label>
+      <input
+        type="text"
+        name="latitude"
+        id="latitude"
+        required
+        placeholder="Ex: 31.6295"
+      />
+    </div>
+
+    <div class="form-field">
+      <label for="longitude">Longitude</label>
+      <input
+        type="text"
+        name="longitude"
+        id="longitude"
+        required
+        placeholder="Ex: -7.9811"
+      />
+    </div>
+
+    <div class="form-field">
+      <label>Disponibilité</label>
+      <div class="availability-selector">
+        <div class="availability-option">
+          <input
+            type="radio"
+            id="disponible"
+            name="disponibilite"
+            value="1"
+            checked
+          />
+          <label for="disponible">Disponible</label>
+        </div>
+        <div class="availability-option">
+          <input
+            type="radio"
+            id="indisponible"
+            name="disponibilite"
+            value="0"
+          />
+          <label for="indisponible">Indisponible</label>
+        </div>
+      </div>
+    </div>
+    <div></div>
+    <div class="form-field">
+      <label for="photos">Photos de la station (max 5)</label>
+      <input
+        type="file"
+        name="photos[]"
+        id="photos"
+        multiple
+        accept="image/*"
+      />
+    </div>
+  </div>
+
+  <div class="btn-container">
+    <button type="button" class="cancel-btn" onclick="window.history.back();">
+      Annuler
+    </button>
+    <button type="submit" class="submit-btn">Enregistrer la station</button>
+  </div>
+</form>
+
+<!-- Script pour gérer les images -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Si nous ajoutons des prévisualisations d'images dans le futur,
+    // nous pourrons utiliser ce gestionnaire d'erreur
+    const imageElements = document.querySelectorAll('.preview-image');
+    imageElements.forEach(function(img) {
+      img.onerror = function() {
+        this.src = placeholderImageUrl;
+        this.onerror = null;
+      };
+    });
+  });
+</script>
+{% endblock content %}

@@ -1,0 +1,65 @@
+{% extends 'help/help_base.html' %}
+
+{% block help_content %}
+<div class="help-header">
+    <a href="{% url 'help:support_home' %}" class="back-link"><i class="fas fa-arrow-left"></i> Retour aux tickets</a>
+    <h1 class="help-title">Ticket #{{ ticket.id }}</h1>
+    <div class="ticket-meta">
+        <span class="status-badge status-{{ ticket.status }}">{{ ticket.get_status_display }}</span>
+        <span class="ticket-date">Créé le {{ ticket.created_at|date:"d/m/Y H:i" }}</span>
+    </div>
+</div>
+
+<div class="ticket-container">
+    <div class="ticket-details">
+        <h2 class="ticket-subject">{{ ticket.subject }}</h2>
+        <div class="ticket-message">
+            <div class="message-header">
+                <span class="message-author">{{ ticket.user.first_name }} {{ ticket.user.last_name }}</span>
+                <span class="message-date">{{ ticket.created_at|date:"d/m/Y H:i" }}</span>
+            </div>
+            <div class="message-content">
+                {{ ticket.message|linebreaks }}
+            </div>
+        </div>
+    </div>
+    
+    <div class="ticket-responses">
+        <h3 class="responses-title">Réponses</h3>
+        
+        {% for response in responses %}
+        <div class="response-item {% if response.user == request.user %}user-response{% else %}admin-response{% endif %}">
+            <div class="response-header">
+                <span class="response-author">{{ response.user.first_name }} {{ response.user.last_name }}</span>
+                <span class="response-date">{{ response.created_at|date:"d/m/Y H:i" }}</span>
+            </div>
+            <div class="response-content">
+                {{ response.message|linebreaks }}
+            </div>
+        </div>
+        {% empty %}
+        <p class="no-items">Aucune réponse pour le moment.</p>
+        {% endfor %}
+    </div>
+    
+    {% if ticket.status != 'closed' %}
+    <div class="response-form-container">
+        <h3 class="form-title">Ajouter une réponse</h3>
+        <form method="post" class="response-form">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                {{ form.message }}
+                {% if form.message.errors %}
+                <div class="form-error">{{ form.message.errors }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn-primary">Envoyer</button>
+            </div>
+        </form>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

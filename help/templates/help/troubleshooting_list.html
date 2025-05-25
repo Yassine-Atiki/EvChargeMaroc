@@ -1,0 +1,86 @@
+{% extends 'help/help_base.html' %} {% block help_content %}
+<div class="help-header">
+  <h1 class="help-title">Centre de Dépannage</h1>
+  <p class="help-description">
+    Trouvez des solutions rapides aux problèmes techniques les plus courants
+    rencontrés sur notre plateforme.
+  </p>
+</div>
+
+<div class="troubleshooting-search">
+  <input
+    type="text"
+    id="troubleshooting-search-input"
+    placeholder="Décrivez votre problème..."
+    class="search-input"
+  />
+</div>
+
+<div class="troubleshooting-list">
+  {% for guide in guides %}
+  <div
+    class="troubleshooting-item"
+    data-title="{{ guide.title }}"
+    data-problem="{{ guide.problem }}"
+    data-solution="{{ guide.solution }}"
+  >
+    <div class="troubleshooting-header" onclick="toggleSolution(this)">
+      <h3 class="troubleshooting-title">{{ guide.title }}</h3>
+      <span class="toggle-icon"><i class="fas fa-chevron-down"></i></span>
+    </div>
+    <div class="troubleshooting-content">
+      <div class="problem-section">
+        <h4>Problème :</h4>
+        <p>{{ guide.problem|linebreaks }}</p>
+      </div>
+      <div class="solution-section">
+        <h4>Solution :</h4>
+        <p>{{ guide.solution|linebreaks }}</p>
+      </div>
+    </div>
+  </div>
+  {% empty %}
+  <p class="no-items">Aucun guide de dépannage disponible pour le moment.</p>
+  {% endfor %}
+</div>
+
+<script>
+  function toggleSolution(element) {
+    const content = element.nextElementSibling;
+    const icon = element.querySelector(".toggle-icon i");
+
+    if (content.style.maxHeight) {
+      content.style.maxHeight = null;
+      icon.classList.remove("fa-chevron-up");
+      icon.classList.add("fa-chevron-down");
+    } else {
+      content.style.maxHeight = content.scrollHeight + "px";
+      icon.classList.remove("fa-chevron-down");
+      icon.classList.add("fa-chevron-up");
+    }
+  }
+
+  document
+    .getElementById("troubleshooting-search-input")
+    .addEventListener("keyup", function () {
+      const searchTerm = this.value.toLowerCase();
+      const items = document.querySelectorAll(".troubleshooting-item");
+
+      items.forEach((item) => {
+        const title = item.getAttribute("data-title").toLowerCase();
+        const problem = item.getAttribute("data-problem").toLowerCase();
+        const solution = item.getAttribute("data-solution").toLowerCase();
+
+        if (
+          title.includes(searchTerm) ||
+          problem.includes(searchTerm) ||
+          solution.includes(searchTerm)
+        ) {
+          item.style.display = "block";
+        } else {
+          item.style.display = "none";
+        }
+      });
+    });
+</script>
+{% endblock %}

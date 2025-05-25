@@ -1,0 +1,67 @@
+{% extends 'help/help_base.html' %} {% block help_content %}
+<div class="help-header">
+  <h1 class="help-title">Centre d'aide EV Charge Maroc</h1>
+  <p class="help-description">
+    Bienvenue dans notre centre d'assistance. Trouvez facilement des solutions à
+    vos questions et optimisez votre expérience sur notre plateforme.
+  </p>
+</div>
+
+<div class="help-cards">
+  <div class="help-card">
+    <div class="card-icon">
+      <i class="fas fa-question-circle"></i>
+    </div>
+    <h2 class="card-title">Foire Aux Questions</h2>
+    <p class="card-description">
+      Découvrez les réponses aux questions les plus fréquentes concernant nos
+      services et fonctionnalités.
+    </p>
+    <a href="{% url 'help:faq_list' %}" class="card-link"
+      >Consulter la FAQ <i class="fas fa-arrow-right"></i
+    ></a>
+  </div>
+
+  <div class="help-card">
+    <div class="card-icon">
+      <i class="fas fa-book"></i>
+    </div>
+    <h2 class="card-title">Tutoriels</h2>
+    <p class="card-description">
+      Apprenez à utiliser toutes les fonctionnalités de notre plateforme grâce à
+      nos guides détaillés et illustrés.
+    </p>
+    <a href="{% url 'help:tutorial_list' %}" class="card-link"
+      >Explorer les tutoriels <i class="fas fa-arrow-right"></i
+    ></a>
+  </div>
+
+  <div class="help-card">
+    <div class="card-icon">
+      <i class="fas fa-tools"></i>
+    </div>
+    <h2 class="card-title">Dépannage</h2>
+    <p class="card-description">
+      Rencontrez-vous des difficultés? Consultez nos guides de résolution pour
+      surmonter rapidement les problèmes courants.
+    </p>
+    <a href="{% url 'help:troubleshooting_list' %}" class="card-link"
+      >Accéder au dépannage <i class="fas fa-arrow-right"></i
+    ></a>
+  </div>
+
+  <div class="help-card support-card">
+    <div class="card-icon">
+      <i class="fas fa-headset"></i>
+    </div>
+    <h2 class="card-title">Support Personnalisé</h2>
+    <p class="card-description">
+      Besoin d'une assistance sur mesure? Notre équipe de support est à votre
+      disposition pour répondre à vos questions spécifiques.
+    </p>
+    <a href="{% url 'help:support_home' %}" class="card-link"
+      >Contacter le support <i class="fas fa-arrow-right"></i
+    ></a>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="page-container">
+    <main class="main-content">
+        <div class="success-container">
+            <h1 class="success-title">Paiement réussi !</h1>
+            <p class="success-message">Votre réservation a été confirmée avec succès. Merci pour votre paiement.</p>
+            <p class="success-details">Un code QR vous sera fourni dans la page de confirmation de votre réservation.</p>
+            <a href="{% url 'stations:station_List_ProprietaireVE' %}" class="btn-primary">Retour à la liste des stations</a>
+            <a href="{% url 'stations:user_reservations' username=request.user.username %}" class="btn-secondary">Voir mes réservations</a>
+        </div>
+    </main>
+</div>
+
+<style>
+    .success-container {
+        text-align: center;
+        padding: 2rem;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    .success-title {
+        color: #16A34A;
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
+    .success-message {
+        font-size: 1.2rem;
+        margin-bottom: 2rem;
+        color: #4B5563;
+    }
+    .success-details {
+        font-size: 1rem;
+        margin-bottom: 2rem;
+        color: #6B7280;
+    }
+    .btn-primary {
+        display: inline-block;
+        padding: 0.75rem 1.5rem;
+        background-color: #16A34A;
+        color: white;
+        text-decoration: none;
+        border-radius: 0.375rem;
+        margin-right: 1rem;
+    }
+    .btn-primary:hover {
+        background-color: #14532D;
+    }
+    .btn-secondary {
+        display: inline-block;
+        padding: 0.75rem 1.5rem;
+        background-color: #6B7280;
+        color: white;
+        text-decoration: none;
+        border-radius: 0.375rem;
+    }
+    .btn-secondary:hover {
+        background-color: #4B5563;
+    }
+</style>
+{% endblock content %}

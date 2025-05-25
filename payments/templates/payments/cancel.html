@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="page-container">
+    <main class="main-content">
+        <div class="cancel-container">
+            <h1 class="cancel-title">Paiement annulé</h1>
+            <p class="cancel-message">
+                {% if error %}
+                    {{ error }}
+                {% else %}
+                    Votre paiement a été annulé. Vous pouvez réessayer si vous le souhaitez.
+                {% endif %}
+            </p>
+            <a href="{% url 'stations:station_List_ProprietaireVE' %}" class="btn-primary">Retour à la liste des stations</a>
+            
+            {% if station %}
+                <a href="{% url 'stations:reservations' ID_Station=station.ID_Station username=request.user.username %}" class="btn-secondary">Réessayer la réservation</a>
+            {% endif %}
+        </div>
+    </main>
+</div>
+
+<style>
+    .cancel-container {
+        text-align: center;
+        padding: 2rem;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    .cancel-title {
+        color: #DC2626;
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
+    .cancel-message {
+        font-size: 1.2rem;
+        margin-bottom: 2rem;
+        color: #4B5563;
+    }
+    .btn-primary {
+        display: inline-block;
+        padding: 0.75rem 1.5rem;
+        background-color: #16A34A;
+        color: white;
+        text-decoration: none;
+        border-radius: 0.375rem;
+        margin-right: 1rem;
+    }
+    .btn-primary:hover {
+        background-color: #14532D;
+    }
+    .btn-secondary {
+        display: inline-block;
+        padding: 0.75rem 1.5rem;
+        background-color: #6B7280;
+        color: white;
+        text-decoration: none;
+        border-radius: 0.375rem;
+    }
+    .btn-secondary:hover {
+        background-color: #4B5563;
+    }
+</style>
+{% endblock content %} 

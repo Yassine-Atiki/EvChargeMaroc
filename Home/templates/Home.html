@@ -1,0 +1,302 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="fr">
+  {% load static %}
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EV Charge Maroc</title>
+    <link rel="stylesheet" href="{% static 'css/Home.css' %}" />
+  </head>
+  <body>
+
+    <section class="hero">
+      <div class="hero-overlay"></div>
+      <div class="hero-content">
+        <h2 class="hero-title">
+          Recharge Facile pour Véhicules Électriques
+          <br />
+          au Maroc
+        </h2>
+        <p class="hero-description">
+          Localisez, réservez et payez facilement votre recharge de véhicule
+          électrique partout
+          <br />
+          au Maroc avec notre réseau de stations connectées.
+        </p>
+        <div class="hero-buttons">
+          <a class="btn btn-primary" href="{% url 'map:map' %}"
+            >Trouver une Station</a
+          >
+          <a
+            href="{% url 'users:inscription'  %}"
+            class="btn btn-outline"
+            style="text-decoration: none"
+            >S'inscrire</a
+          >
+        </div>
+      </div>
+    </section>
+
+    <section class="features">
+      <h2 class="section-title">Pourquoi Choisir EV Charge Maroc?</h2>
+      <div class="features-grid">
+        <article class="feature-card">
+          <div class="feature-icon">
+            <svg
+              width="25"
+              height="25"
+              viewBox="0 0 25 25"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M20.08 10.33C20.08 16.33 12.08 22.33 12.08 22.33C12.08 22.33 4.07996 16.33 4.07996 10.33C4.07996 8.20822 4.92281 6.17339 6.4231 4.6731C7.92339 3.17281 9.95822 2.32996 12.08 2.32996C14.2017 2.32996 16.2365 3.17281 17.7368 4.6731C19.2371 6.17339 20.08 8.20822 20.08 10.33Z"
+                stroke="#16A34A"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              ></path>
+              <path
+                d="M12.08 13.33C13.7368 13.33 15.08 11.9868 15.08 10.33C15.08 8.6731 13.7368 7.32996 12.08 7.32996C10.4231 7.32996 9.07996 8.6731 9.07996 10.33C9.07996 11.9868 10.4231 13.33 12.08 13.33Z"
+                stroke="#16A34A"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              ></path>
+            </svg>
+          </div>
+          <h3 class="feature-title">Localisation Facile</h3>
+          <p class="feature-description">
+            Trouvez rapidement les stations
+            <br />
+            de recharge près de vous ou sur
+            <br />
+            votre itinéraire.
+          </p>
+        </article>
+
+        <article class="feature-card">
+          <div class="feature-icon">
+            <svg
+              width="25"
+              height="25"
+              viewBox="0 0 25 25"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M15.2501 7.32996H16.2501C16.7805 7.32996 17.2892 7.54067 17.6643 7.91574C18.0393 8.29082 18.2501 8.79952 18.2501 9.32996V15.33C18.2501 15.8604 18.0393 16.3691 17.6643 16.7442C17.2892 17.1192 16.7805 17.33 16.2501 17.33H14.2501"
+                stroke="#16A34A"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              ></path>
+              <path
+                d="M6.25006 7.32996H4.25006C3.71963 7.32996 3.21092 7.54067 2.83585 7.91574C2.46077 8.29082 2.25006 8.79952 2.25006 9.32996V15.33C2.25006 15.8604 2.46077 16.3691 2.83585 16.7442C3.21092 17.1192 3.71963 17.33 4.25006 17.33H5.25006"
+                stroke="#16A34A"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              ></path>
+              <path
+                d="M11.2501 7.32996L8.25006 12.33H12.2501L9.25006 17.33"
+                stroke="#16A34A"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              ></path>
+              <path
+                d="M22.2501 11.33V13.33"
+                stroke="#16A34A"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              ></path>
+            </svg>
+          </div>
+          <h3 class="feature-title">Recharge Rapide</h3>
+          <p class="feature-description">
+            Accédez à des bornes de
+            <br />
+            recharge rapide compatibles
+            <br />
+            avec tous les véhicules
+            <br />
+            électriques.
+          </p>
+        </article>
+
+        <article class="feature-card">
+          <div class="feature-icon">
+            <svg
+              width="25"
+              height="25"
+              viewBox="0 0 25 25"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M20.42 5.32996H4.42004C3.31547 5.32996 2.42004 6.22539 2.42004 7.32996V17.33C2.42004 18.4345 3.31547 19.33 4.42004 19.33H20.42C21.5246 19.33 22.42 18.4345 22.42 17.33V7.32996C22.42 6.22539 21.5246 5.32996 20.42 5.32996Z"
+                stroke="#16A34A"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              ></path>
+              <path
+                d="M2.42004 10.33H22.42"
+                stroke="#16A34A"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              ></path>
+            </svg>
+          </div>
+          <h3 class="feature-title">Paiement Facile</h3>
+          <p class="feature-description">
+            Payez directement via
+            <br />
+            l'application avec plusieurs
+            <br />
+            méthodes de paiement
+            <br />
+            sécurisées.
+          </p>
+        </article>
+
+        <article class="feature-card">
+          <div class="feature-icon">
+            <svg
+              width="25"
+              height="25"
+              viewBox="0 0 25 25"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M11.58 20.33C9.82409 20.3353 8.13028 19.6805 6.83454 18.4954C5.53881 17.3103 4.73579 15.6815 4.58476 13.9321C4.43373 12.1826 4.94572 10.4403 6.01918 9.0507C7.09264 7.66108 8.64916 6.72566 10.38 6.42996C16.08 5.32996 17.58 4.80996 19.58 2.32996C20.58 4.32996 21.58 6.50996 21.58 10.33C21.58 15.83 16.8 20.33 11.58 20.33Z"
+                stroke="#16A34A"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              ></path>
+              <path
+                d="M2.58002 21.33C2.58002 18.33 4.43002 15.97 7.66002 15.33C10.08 14.85 12.58 13.33 13.58 12.33"
+                stroke="#16A34A"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              ></path>
+            </svg>
+          </div>
+          <h3 class="feature-title">Écologique</h3>
+          <p class="feature-description">
+            Contribuez à la réduction de
+            <br />
+            l'empreinte carbone au Maroc
+            <br />
+            avec chaque recharge.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section class="how-it-works">
+      <h2 class="section-title">Comment Ça Marche</h2>
+      <div class="steps-container">
+        <article class="step">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <h3 class="step-title">Localisez</h3>
+            <p class="step-description">
+              Utilisez notre carte interactive pour trouver les
+              <br />
+              stations de recharge les plus proches ou sur
+              <br />
+              votre itinéraire.
+            </p>
+          </div>
+        </article>
+
+        <article class="step">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <h3 class="step-title">Réservez</h3>
+            <p class="step-description">
+              Réservez votre créneau horaire à l'avance pour
+              <br />
+              garantir la disponibilité de la borne à votre
+              <br />
+              arrivée.
+            </p>
+          </div>
+        </article>
+
+        <article class="step">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <h3 class="step-title">Rechargez</h3>
+            <p class="step-description">
+              Connectez votre véhicule et commencez la
+              <br />
+              recharge. Suivez l'état de la recharge en temps
+              <br />
+              réel via l'application.
+            </p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="stats">
+      <article class="stat-item">
+        <h3 class="stat-number">{{ stats.station_count|add_plus }}</h3>
+        <p class="stat-label">Stations de recharge</p>
+      </article>
+      <article class="stat-item">
+        <h3 class="stat-number">{{ stats.villes_count|add_plus }}</h3>
+        <p class="stat-label">Villes couvertes</p>
+      </article>
+      <article class="stat-item">
+        <h3 class="stat-number">{{ stats.users_count|format_k }}+</h3>
+        <p class="stat-label">Utilisateurs satisfaits</p>
+      </article>
+      <article class="stat-item">
+        <h3 class="stat-number">{{ stats.recharges_count|format_k }}+</h3>
+        <p class="stat-label">Recharges effectuées</p>
+      </article>
+    </section>
+
+    <section class="cta">
+      <div class="cta-content">
+        <h2 class="cta-title">Prêt à rejoindre la révolution électrique?</h2>
+        <p class="cta-description">
+          Inscrivez-vous dès aujourd'hui et bénéficiez d'avantages exclusifs
+          pour vos
+          <br />
+          recharges.
+        </p>
+        <a
+          href="{% url 'users:inscription'  %}"
+          class="btn btn-light"
+          style="text-decoration: none"
+          >S'inscrire Maintenant</a
+        >
+      </div>
+      <img
+        src="https://cdn.builder.io/api/v1/image/assets/TEMP/4d8c250b73db0beb02641b5804840703cbc8e027"
+        alt="Electric Vehicle Left"
+        class="cta-image-left"
+      />
+      <img
+        src="https://cdn.builder.io/api/v1/image/assets/TEMP/00d5e05546ba6077b32e443362daee9e18e419bd"
+        alt="Electric Vehicle Right"
+        class="cta-image-right"
+      />
+    </section>
+
+  </body>
+</html>
+{% endblock content %}

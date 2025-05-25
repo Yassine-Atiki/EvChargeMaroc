@@ -1,0 +1,802 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load station_filters %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/station_details.css' %}" />
+
+<div class="page-container">
+    <main class="main-content">
+        <div class="station-details-container">
+            <a href="{% url 'stations:station_List_ProprietaireVE' %}" class="back-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="#020817" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Retour à la liste
+            </a>
+
+            <div class="station-details-header">
+                <h1 class="station-details-title">{{ station.nom }}</h1>
+                <div class="station-details-meta">
+                    <span class="status-badge {% if station.disponibilite %}available{% else %}unavailable{% endif %}">
+                        {{ station.disponibilite|yesno:"Disponible,Indisponible" }}
+                    </span>
+                    <div class="station-rating">
+                        <span class="rating-value">{{ note_moyenne }}</span>
+                        <div class="stars">
+                            <div class="stars-container">
+                                {% for i in "12345" %}
+                                <svg class="star {% if i|add:0 <= note_moyenne|add:0 %}filled{% endif %}" viewBox="0 0 24 24" width="24" height="24">
+                                    <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+                                </svg>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section principale avec galerie et informations -->
+            <div class="station-details-content">
+                <div class="station-details-gallery">
+                    <div class="gallery-main">
+                        <img src="{% if photos %}{{ photos.0.image.url }}{% else %}{% static 'images/placeholder.jpg' %}{% endif %}" alt="{{ station.nom }}" class="station-main-image" id="mainImage">
+                    </div>
+                    <div class="station-thumbnails">
+                        {% for photo in photos %}
+                            <img src="{{ photo.image.url }}" alt="{{ station.nom }} {{ forloop.counter }}" class="station-thumbnail {% if forloop.first %}active{% endif %}" data-image="{{ photo.image.url }}">
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="station-details-info">
+                    <div class="info-section">
+                        <h3 class="info-title">Informations</h3>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <span class="info-label">Adresse</span>
+                                <span class="info-value">{{ station.adresse }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Opérateur</span>
+                                <span class="info-value">{{ station.operator|default:"Non spécifié" }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Prix</span>
+                                <span class="info-value">{{ station.prix_kw }} DH/kWh</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Puissance maximale</span>
+                                <span class="info-value">{{ station.puissance }} kW</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-section">
+                        <h3 class="info-title">Types de connecteurs</h3>
+                        <div class="connector-list">
+                            {% for connector in connectors %}
+                                <div class="connector-item">
+                                    <div class="connector-icon">
+                                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M7 17H4C3.46957 17 2.96086 16.7893 2.58579 16.4142C2.21071 16.0391 2 15.5304 2 15V13C2 12.4696 2.21071 11.9609 2.58579 11.5858C2.96086 11.2107 3.46957 11 4 11H7M17 17H20C20.5304 17 21.0391 16.7893 21.4142 16.4142C21.7893 16.0391 22 15.5304 22 15V13C22 12.4696 21.7893 11.9609 21.4142 11.5858C21.0391 11.2107 20.5304 11 20 11H17M14 11H10M14 17H10M12 11V7" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                    </div>
+                                    <div class="connector-details">
+                                        <h4 class="connector-name">{{ connector }}</h4>
+                                        <p class="connector-power">Puissance max: {{ station.puissance }} kW</p>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Nouvelle section de réservation réorganisée -->
+            <div class="reservation-section" id="reservation">
+                <h2 class="reservation-title">Réserver cette station</h2>
+                
+                <div class="reservation-steps">
+                    <!-- Étape 1: Sélection de la date -->
+                    <div class="reservation-step active" id="step-date">
+                        <div class="step-header">
+                            <div class="step-number">1</div>
+                            <h3 class="step-title">Choisir une date</h3>
+                        </div>
+                        <div class="step-content">
+                            <div class="calendar-navigation">
+                                {% if prev_date|date:'Y-m-d' >= now|date:'Y-m-d' %}
+                                    <a href="javascript:void(0)" class="calendar-nav-btn" id="prev-day" data-date="{{ prev_date|date:'Y-m-d' }}" data-station="{{ station.ID_Station }}" data-username="{{ request.user.username }}">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                        <span class="nav-text">Jour précédent</span>
+                                    </a>
+                                {% endif %}
+                                <div class="current-date-display">
+                                    <span class="date-value">{{ current_date|date:"d F Y" }}</span>
+                                    <span class="date-day">{{ current_date|date:"l"|capfirst }}</span>
+                                </div>
+                                <a href="javascript:void(0)" class="calendar-nav-btn" id="next-day" data-date="{{ next_date|date:'Y-m-d' }}" data-station="{{ station.ID_Station }}" data-username="{{ request.user.username }}">
+                                    <span class="nav-text">Jour suivant</span>
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </a>
+                            </div>
+                            <button class="step-next-btn" onclick="goToStep('step-time')">Continuer</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Étape 2: Sélection du créneau horaire -->
+                    <div class="reservation-step" id="step-time">
+                        <div class="step-header">
+                            <div class="step-number">2</div>
+                            <h3 class="step-title">Choisir un créneau horaire</h3>
+                        </div>
+                        <div class="step-content">
+                            <div class="time-slots-container">
+                                {% for period, slots in time_slots.items %}
+                                <div class="time-period">
+                                    <h5 class="time-period-title">{{ period|title }}</h5>
+                                    <div class="time-slots">
+                                        {% for slot in slots %}
+                                        <div class="time-slot {% if slot.available %}available{% else %}unavailable{% endif %}"
+                                             data-time="{{ slot.time }}">
+                                            <span class="time-slot-time">{{ slot.time }}</span>
+                                            <span class="time-slot-status">
+                                                {% if slot.available %}
+                                                <svg class="status-icon available" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <path d="M20 6L9 17l-5-5"></path>
+                                                </svg>
+                                                Disponible
+                                                {% else %}
+                                                <svg class="status-icon unavailable" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <path d="M18 6L6 18M6 6l12 12"></path>
+                                                </svg>
+                                                Réservé
+                                                {% endif %}
+                                            </span>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <div class="step-navigation">
+                                <button class="step-back-btn" onclick="goToStep('step-date')">Retour</button>
+                                <button class="step-next-btn" id="time-continue-btn" onclick="goToStep('step-details')" disabled>Continuer</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Étape 3: Détails de la réservation -->
+                    <div class="reservation-step" id="step-details">
+                        <div class="step-header">
+                            <div class="step-number">3</div>
+                            <h3 class="step-title">Configurer votre réservation</h3>
+                        </div>
+                        <div class="step-content">
+                            <form id="reservation-form" data-station-id="{{ station.ID_Station }}" onsubmit="event.preventDefault(); initiateCheckout();">
+                                {% csrf_token %}
+                                <input type="hidden" name="selected_date" value="{{ current_date|date:'Y-m-d' }}">
+                                
+                                <div class="reservation-details-grid">
+                                    <div class="form-group">
+                                        <label for="selected-time">Créneau sélectionné</label>
+                                        <input type="text" id="selected-time" name="time_start" readonly class="form-control">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="charging-power">Puissance de charge (kW)</label>
+                                        <select id="charging-power" name="power" class="form-control">
+                                            <option value="50">50 kW</option>
+                                            <option value="100">100 kW</option>
+                                            <option value="150">150 kW</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="duration">Durée</label>
+                                        <select id="duration" name="duration" class="form-control">
+                                            <option value="0.25">15 minutes</option>
+                                            <option value="0.5">30 minutes</option>
+                                            <option value="0.75">45 minutes</option>
+                                            <option value="1">1 heure</option>
+                                            <option value="1.25">1 heure 15 minutes</option>
+                                            <option value="1.5">1 heure 30 minutes</option>
+                                            <option value="1.75">1 heure 45 minutes</option>
+                                            <option value="2">2 heures</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="reservation-summary">
+                                    <h4 class="summary-title">Récapitulatif</h4>
+                                    <div class="summary-details">
+                                        <div class="summary-item">
+                                            <span class="summary-label">Date:</span>
+                                            <span class="summary-value" id="summary-date">{{ current_date|date:"d F Y" }}</span>
+                                        </div>
+                                        <div class="summary-item">
+                                            <span class="summary-label">Heure:</span>
+                                            <span class="summary-value" id="summary-time">-</span>
+                                        </div>
+                                        <div class="summary-item">
+                                            <span class="summary-label">Durée:</span>
+                                            <span class="summary-value" id="summary-duration">15 minutes</span>
+                                        </div>
+                                        <div class="summary-item">
+                                            <span class="summary-label">Puissance:</span>
+                                            <span class="summary-value" id="summary-power">50 kW</span>
+                                        </div>
+                                        <div class="summary-item total">
+                                            <span class="summary-label">Prix estimé:</span>
+                                            <span class="summary-value price" id="estimated-price">0.00 DH</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="step-navigation">
+                                    <button type="button" class="step-back-btn" onclick="goToStep('step-time')">Retour</button>
+                                    <button type="submit" id="reserve-button" class="btn-primary">
+                                        <span>Réserver maintenant</span>
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section des avis -->
+            <div class="reviews-section">
+                <h2 class="section-title">Avis des utilisateurs</h2>
+                
+                <!-- Onglets pour basculer entre les avis et le formulaire -->
+                <div class="reviews-tabs">
+                    <button class="tab-button active" data-tab="reviews-tab">Voir les avis ({{ reviews|length }})</button>
+                    {% if has_reservation %}
+                    <button class="tab-button" data-tab="add-review-tab">
+                        {% if user_review %}
+                        Modifier votre avis
+                        {% else %}
+                        Ajouter votre avis
+                        {% endif %}
+                    </button>
+                    {% endif %}
+                </div>
+                
+                <!-- Contenu des onglets -->
+                <div class="tab-content">
+                    <!-- Onglet des avis -->
+                    <div class="tab-pane active" id="reviews-tab">
+                        <div class="reviews-summary">
+                            <div class="reviews-average">
+                                <div class="big-rating">{{ note_moyenne }}</div>
+                                <div class="rating-stars-container">
+                                    {% for i in "12345" %}
+                                    <div class="rating-star {% if i|add:0 <= note_moyenne|add:0 %}filled{% endif %}">★</div>
+                                    {% endfor %}
+                                </div>
+                                <div class="reviews-count">Basé sur {{ reviews|length }} avis</div>
+                            </div>
+                            
+                            <!-- Graphique de répartition des notes -->
+                            <div class="reviews-breakdown">
+                                {% for i in "54321" %}
+                                {% with count=reviews|filter_by_rating:i|length %}
+                                <div class="review-bar">
+                                    <div class="review-label">{{ i }} étoiles</div>
+                                    <div class="review-bar-container">
+                                        <div class="review-bar-fill percent-{{ count|default:0 }}-of-{{ reviews.count|default:1 }}"></div>
+                                    </div>
+                                    <div class="review-count">{{ count }}</div>
+                                </div>
+                                {% endwith %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <!-- Liste des avis -->
+                        <div class="reviews-list">
+                            {% if reviews %}
+                                {% for review in reviews %}
+                                <div class="review-item {% if review.username.username == user.username %}my-review{% endif %}">
+                                    <div class="rating-corner">
+                                        {% for i in "12345" %}
+                                        <span class="corner-star {% if i|add:0 <= review.note %}filled{% endif %}">★</span>
+                                        {% endfor %}
+                                    </div>
+                                    <div class="review-header">
+                                        <div class="review-user">
+                                            <div class="review-avatar">
+                                                <span>{{ review.username.username|first|upper }}</span>
+                                            </div>
+                                            <div class="review-user-info">
+                                                <div class="review-username">{{ review.username.username }}</div>
+                                                <div class="review-date">{{ review.date_ajout|date:"d F Y" }}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="review-content">
+                                        {{ review.commentaire }}
+                                    </div>
+                                    {% if review.username.username == user.username %}
+                                    <div class="review-actions">
+                                        <button class="edit-review-btn" data-tab="add-review-tab">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                            </svg>
+                                            Modifier
+                                        </button>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% endfor %}
+                                {% if reviews|length > 3 %}
+                                <button class="btn-secondary" id="show-more-reviews">Voir plus d'avis</button>
+                                {% endif %}
+                            {% else %}
+                                <div class="no-reviews">
+                                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5">
+                                        <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+                                    </svg>
+                                    <p>Aucun avis pour le moment. Soyez le premier à partager votre expérience !</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Onglet d'ajout/modification d'avis -->
+                    {% if has_reservation %}
+                    <div class="tab-pane" id="add-review-tab">
+                        <div class="add-review-section">
+                            <h4 class="review-form-title {% if user_review %}edit{% endif %}">
+                                {% if user_review %}
+                                Modifier votre avis
+                                {% else %}
+                                Partagez votre expérience
+                                {% endif %}
+                            </h4>
+                            <form method="POST" action="{% url 'stations:edit_review' station.ID_Station username %}" class="review-form {% if user_review %}edit{% endif %}">
+                                {% csrf_token %}
+                                <div class="rating-input">
+                                    <span class="rating-label">Votre note:</span>
+                                    <div class="star-rating">
+                                        <input type="radio" id="star5" name="note" value="5" {% if user_review and user_review.note == 5 %}checked{% endif %} required>
+                                        <label for="star5" title="5 étoiles - Excellent">
+                                            <svg viewBox="0 0 24 24"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+                                        </label>
+                                        
+                                        <input type="radio" id="star4" name="note" value="4" {% if user_review and user_review.note == 4 %}checked{% endif %} required>
+                                        <label for="star4" title="4 étoiles - Très bien">
+                                            <svg viewBox="0 0 24 24"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+                                        </label>
+                                        
+                                        <input type="radio" id="star3" name="note" value="3" {% if user_review and user_review.note == 3 %}checked{% endif %} required>
+                                        <label for="star3" title="3 étoiles - Bien">
+                                            <svg viewBox="0 0 24 24"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+                                        </label>
+                                        
+                                        <input type="radio" id="star2" name="note" value="2" {% if user_review and user_review.note == 2 %}checked{% endif %} required>
+                                        <label for="star2" title="2 étoiles - Moyen">
+                                            <svg viewBox="0 0 24 24"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+                                        </label>
+                                        
+                                        <input type="radio" id="star1" name="note" value="1" {% if user_review and user_review.note == 1 %}checked{% endif %} required>
+                                        <label for="star1" title="1 étoile - Mauvais">
+                                            <svg viewBox="0 0 24 24"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="comment-input">
+                                    <label for="commentaire">Votre commentaire:</label>
+                                    <textarea id="commentaire" name="commentaire" rows="4" required placeholder="Partagez votre expérience avec cette station...">{% if user_review %}{{ user_review.commentaire }}{% endif %}</textarea>
+                                </div>
+                                <div class="form-actions">
+                                    <button type="button" class="btn-secondary cancel-review">Annuler</button>
+                                    <button type="submit" class="btn-primary">
+                                        {% if user_review %}
+                                        Mettre à jour
+                                        {% else %}
+                                        Publier
+                                        {% endif %}
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    {% elif user.is_authenticated %}
+                    <div class="review-notice">
+                        <p>Vous pourrez laisser un avis après avoir utilisé cette station.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Définition du gradient pour les étoiles à moitié remplies -->
+<svg width="0" height="0" style="position: absolute;">
+    <defs>
+        <linearGradient id="half-fill" x1="0" x2="100%" y1="0" y2="0">
+            <stop offset="50%" stop-color="#fbbf24"></stop>
+            <stop offset="50%" stop-color="transparent"></stop>
+        </linearGradient>
+    </defs>
+</svg>
+
+<!-- Charger la bibliothèque Stripe -->
+<script src="https://js.stripe.com/v3/"></script>
+
+<script>
+// Fonction pour naviguer entre les étapes
+function goToStep(stepId) {
+    // Masquer toutes les étapes
+    document.querySelectorAll('.reservation-step').forEach(step => {
+        step.classList.remove('active');
+    });
+    
+    // Afficher l'étape demandée
+    document.getElementById(stepId).classList.add('active');
+    
+    // Faire défiler jusqu'à l'étape
+    document.getElementById(stepId).scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// Définir initiateCheckout globalement
+function initiateCheckout() {
+    const form = document.getElementById('reservation-form');
+    const stationId = form.getAttribute('data-station-id');
+    const selectedDate = form.querySelector('input[name="selected_date"]').value;
+    const timeStart = form.querySelector('input[name="time_start"]').value;
+    const duration = form.querySelector('select[name="duration"]').value;
+    const power = form.querySelector('select[name="power"]').value;
+
+    console.log("Form data:", { stationId, selectedDate, timeStart, duration, power });
+
+    // Vérifier que l'utilisateur a sélectionné un créneau horaire
+    if (!timeStart) {
+        alert("Veuillez sélectionner un créneau horaire.");
+        goToStep('step-time');
+        return;
+    }
+
+    // Combiner la date et l'heure pour créer un format ISO
+    const timeStartDate = new Date(`${selectedDate}T${timeStart}:00`);
+    const timeStartISO = timeStartDate.toISOString();
+    console.log("Time Start ISO:", timeStartISO);
+
+    // Fonction pour récupérer le jeton CSRF
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== "") {
+            const cookies = document.cookie.split(";");
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === name + "=") {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    const csrftoken = getCookie("csrftoken");
+    console.log("CSRF Token:", csrftoken);
+
+    // Initialiser Stripe
+    const stripe = Stripe('{{ STRIPE_PUBLISHABLE_KEY }}');
+    console.log("Stripe initialized with key:", '{{ STRIPE_PUBLISHABLE_KEY }}');
+
+    // Vérifier d'abord que le serveur Django est bien en cours d'exécution
+    fetch('/admin/login/', { method: 'HEAD' })
+        .then(response => {
+            if (response.ok) {
+                // Le serveur répond, on peut continuer avec la requête de paiement
+                processPayment();
+            } else {
+                alert("Le serveur Django ne répond pas correctement. Veuillez vérifier qu'il est bien démarré.");
+            }
+        })
+        .catch(error => {
+            console.error("Erreur de connexion au serveur:", error);
+            alert("Impossible de se connecter au serveur Django. Veuillez vérifier qu'il est bien démarré et que vous êtes connecté à Internet.");
+        });
+
+    // Fonction pour traiter le paiement
+    function processPayment() {
+        // Utiliser FormData pour un meilleur suivi des données envoyées
+        const formData = new FormData();
+        formData.append('time_start', timeStartISO);
+        formData.append('duration', duration);
+        formData.append('power', power);
+        
+        // Créer l'URL avec un slash final pour correspondre à l'URL Django
+        const paymentUrl = `/payments/checkout/${stationId}/`;
+        console.log("Envoi des données vers", paymentUrl);
+        
+        // Tentative avec fetch et FormData
+        fetch(paymentUrl, {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": csrftoken
+            },
+            body: formData
+        })
+        .then((response) => {
+            console.log("Fetch response status:", response.status);
+            console.log("Fetch response headers:", response.headers);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then((data) => {
+            console.log("Fetch response data:", data);
+            if (data.id) {
+                stripe.redirectToCheckout({ sessionId: data.id })
+                    .then((result) => {
+                        if (result.error) {
+                            console.error("Stripe redirect error:", result.error.message);
+                            alert("Erreur lors de la redirection vers Stripe : " + result.error.message);
+                        }
+                    });
+            } else {
+                alert("Erreur : " + (data.error || "Impossible d'initier le paiement"));
+            }
+        })
+        .catch((error) => {
+            console.error("Erreur lors de l'initiation du paiement :", error);
+            
+            // Approche alternative - redirection directe
+            if (error.message.includes('404')) {
+                console.log("Tentative avec redirection directe...");
+                
+                // Créer un formulaire invisible et le soumettre
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = paymentUrl;
+                
+                // Ajouter le token CSRF
+                const csrfInput = document.createElement('input');
+                csrfInput.type = 'hidden';
+                csrfInput.name = 'csrfmiddlewaretoken';
+                csrfInput.value = csrftoken;
+                form.appendChild(csrfInput);
+                
+                // Ajouter les données du formulaire
+                const timeStartInput = document.createElement('input');
+                timeStartInput.type = 'hidden';
+                timeStartInput.name = 'time_start';
+                timeStartInput.value = timeStartISO;
+                form.appendChild(timeStartInput);
+                
+                const durationInput = document.createElement('input');
+                durationInput.type = 'hidden';
+                durationInput.name = 'duration';
+                durationInput.value = duration;
+                form.appendChild(durationInput);
+                
+                const powerInput = document.createElement('input');
+                powerInput.type = 'hidden';
+                powerInput.name = 'power';
+                powerInput.value = power;
+                form.appendChild(powerInput);
+                
+                // Ajouter le formulaire au DOM et le soumettre
+                document.body.appendChild(form);
+                form.submit();
+            } else if (error.message.includes('409')) {
+                // Erreur 409 - Conflit de réservation (créneau déjà réservé)
+                alert("Ce créneau horaire est déjà réservé. Veuillez en choisir un autre.");
+                
+                // Réinitialiser la sélection
+                if (selectedSlot) {
+                    selectedSlot.classList.remove('selected');
+                    selectedSlot = null;
+                }
+                selectedTimeInput.value = "";
+                goToStep('step-time');
+            } else if (error.message.includes('Failed to fetch')) {
+                alert("Impossible de se connecter au serveur de paiement. Assurez-vous que le serveur est en cours d'exécution.");
+            } else {
+                alert("Une erreur est survenue : " + error.message);
+            }
+        });
+    }
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    // Miniatures de la galerie
+    const thumbnails = document.querySelectorAll('.station-thumbnail');
+    const mainImage = document.getElementById('mainImage');
+    thumbnails.forEach(thumbnail => {
+        thumbnail.addEventListener('click', function () {
+            mainImage.src = this.getAttribute('data-image');
+            thumbnails.forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+        });
+    });
+
+    // Créneaux horaires
+    const timeSlots = document.querySelectorAll('.time-slot.available');
+    const selectedTimeInput = document.getElementById('selected-time');
+    const timeContinueBtn = document.getElementById('time-continue-btn');
+    let selectedSlot = null;
+
+    timeSlots.forEach(slot => {
+        slot.addEventListener('click', function () {
+            if (selectedSlot) {
+                selectedSlot.classList.remove('selected');
+            }
+            this.classList.add('selected');
+            selectedSlot = this;
+            const selectedTime = this.dataset.time;
+            selectedTimeInput.value = selectedTime;
+            document.getElementById('summary-time').textContent = selectedTime;
+            timeContinueBtn.disabled = false;
+            updateEstimatedPrice();
+        });
+    });
+
+    // Calcul du prix estimé
+    const chargingPowerSelect = document.getElementById('charging-power');
+    const durationSelect = document.getElementById('duration');
+    const estimatedPriceEl = document.getElementById('estimated-price');
+    const pricePerKwh = parseFloat("{{ station.prix_kw|floatformat:2 }}".replace(',', '.'));
+
+    function updateEstimatedPrice() {
+        const power = parseFloat(chargingPowerSelect.value);
+        const duration = parseFloat(durationSelect.value);
+        const estimatedPrice = (power * duration * pricePerKwh).toFixed(2);
+        estimatedPriceEl.textContent = estimatedPrice + ' DH';
+    }
+
+    // Mise à jour du récapitulatif
+    function updateSummary() {
+        const power = chargingPowerSelect.value;
+        const duration = durationSelect.value;
+        let durationText = '';
+        
+        switch(duration) {
+            case '0.25': durationText = '15 minutes'; break;
+            case '0.5': durationText = '30 minutes'; break;
+            case '0.75': durationText = '45 minutes'; break;
+            case '1': durationText = '1 heure'; break;
+            case '1.25': durationText = '1 heure 15 minutes'; break;
+            case '1.5': durationText = '1 heure 30 minutes'; break;
+            case '1.75': durationText = '1 heure 45 minutes'; break;
+            case '2': durationText = '2 heures'; break;
+            default: durationText = duration + ' heure(s)';
+        }
+        
+        document.getElementById('summary-power').textContent = power + ' kW';
+        document.getElementById('summary-duration').textContent = durationText;
+        updateEstimatedPrice();
+    }
+
+    chargingPowerSelect.addEventListener('change', function() {
+        updateSummary();
+    });
+    
+    durationSelect.addEventListener('change', function() {
+        updateSummary();
+    });
+    
+    updateSummary();
+
+    // Navigation jour précédent / suivant
+    const prevDay = document.getElementById('prev-day');
+    const nextDay = document.getElementById('next-day');
+
+    function handleNavigation(event) {
+        event.preventDefault();
+        // Récupérer l'élément <a> qui est le bouton, même si l'utilisateur a cliqué sur un élément enfant
+        const link = event.currentTarget;
+        const date = link.getAttribute('data-date');
+        const stationId = link.getAttribute('data-station');
+        const username = link.getAttribute('data-username');
+        
+        console.log("Navigation: date=", date, "stationId=", stationId, "username=", username);
+        
+        // Construire et rediriger vers l'URL
+        const url = `/stations/station/${stationId}/${username}/reservations/?date=${date}`;
+        console.log("Redirection vers:", url);
+        window.location.href = url;
+    }
+
+    // Assigner les gestionnaires d'événements directement aux boutons
+    if (prevDay) {
+        prevDay.addEventListener('click', handleNavigation);
+        // S'assurer que tous les enfants du bouton ne bloquent pas les clics
+        Array.from(prevDay.children).forEach(child => {
+            child.style.pointerEvents = 'none';
+        });
+    }
+    
+    if (nextDay) {
+        nextDay.addEventListener('click', handleNavigation);
+        // S'assurer que tous les enfants du bouton ne bloquent pas les clics
+        Array.from(nextDay.children).forEach(child => {
+            child.style.pointerEvents = 'none';
+        });
+    }
+
+    // Gestion des onglets
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabPanes = document.querySelectorAll('.tab-pane');
+
+    tabButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            tabPanes.forEach(pane => pane.classList.remove('active'));
+            
+            this.classList.add('active');
+            const tabId = this.getAttribute('data-tab');
+            document.getElementById(tabId).classList.add('active');
+        });
+    });
+
+    // Gestion des boutons de modification d'avis
+    const editButtons = document.querySelectorAll('.edit-review-btn');
+
+    editButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const tabId = this.getAttribute('data-tab');
+            
+            tabButtons.forEach(btn => {
+                if (btn.getAttribute('data-tab') === tabId) {
+                    btn.click();
+                }
+            });
+        });
+    });
+
+    // Gestion du bouton Annuler dans le formulaire d'avis
+    const cancelButton = document.querySelector('.cancel-review');
+    if (cancelButton) {
+        cancelButton.addEventListener('click', function() {
+            tabButtons.forEach(btn => {
+                if (btn.getAttribute('data-tab') === 'reviews-tab') {
+                    btn.click();
+                }
+            });
+        });
+    }
+
+    // Initialiser les barres de pourcentage pour les avis
+    const ratingBars = document.querySelectorAll('.review-bar-fill');
+    ratingBars.forEach(function(bar) {
+        const classes = bar.className.split(' ');
+        for (const cls of classes) {
+            if (cls.startsWith('percent-')) {
+                const [_, count, __, total] = cls.split('-');
+                const countInt = parseInt(count);
+                if (total > 0) {
+                    if (countInt > 0) {
+                        // N'afficher la barre colorée que lorsqu'il y a des avis pour cette note
+                        const percent = (countInt / parseInt(total)) * 100;
+                        bar.style.width = percent + '%';
+                        bar.classList.add('has-reviews'); // Ajouter la classe pour la couleur jaune
+                    } else {
+                        // Pour les notes sans avis, afficher une barre grise de largeur 0%
+                        bar.style.width = '0%';
+                    }
+                } else {
+                    bar.style.width = '0%';
+                }
+                break;
+            }
+        }
+    });
+});
+</script>
+{% endblock content %}

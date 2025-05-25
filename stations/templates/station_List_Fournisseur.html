@@ -1,0 +1,354 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+{% load static %} 
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'css/station_List_Fournisseur.css'%}" />
+<link
+  href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+  rel="stylesheet"
+/>
+
+<!-- Définissons l'URL de l'image de remplacement en début de template -->
+<script>
+  const placeholderImageUrl = "{% static 'images/photo-placeholder.jpg' %}";
+</script>
+
+<div class="page-container">
+  <main class="main-content">
+    <section class="hero-section">
+      <h1 class="page-title">Stations de recharge</h1>
+      <p class="page-description">
+        Trouvez des stations de recharge pour véhicules électriques partout au
+        Maroc.
+      </p>
+
+      <div class="search-controls">
+        <div class="search-input">
+          <img
+            src="https://cdn.builder.io/api/v1/image/assets/bf3934ef47c34024b3445b90b3c37150/012e558f792b55184038d7702a7762245ec50e95?placeholderIfAbsent=true"
+            alt="Search"
+            class="search-icon station-image"
+          />
+          <input
+            type="text"
+            id="search-input"
+            placeholder="Rechercher par ville, adresse ou nom de station..."
+          />
+        </div>
+        <button id="filter-button" class="filter-button">
+          <img
+            src="https://cdn.builder.io/api/v1/image/assets/bf3934ef47c34024b3445b90b3c37150/9cba09b1252d70f7dadcd7ecbf9167a6fddf6fd6?placeholderIfAbsent=true"
+            alt="Filter"
+            class="filter-icon station-image"
+          />
+          <span>Filtres</span>
+        </button>
+        <button id="proximity-button" class="proximity-button">
+          <img
+            src="https://cdn.builder.io/api/v1/image/assets/bf3934ef47c34024b3445b90b3c37150/662d455b30bb3f79722a218296168b989ff420c4?placeholderIfAbsent=true"
+            alt="Location"
+            class="location-icon station-image"
+          />
+          <span>À proximité</span>
+        </button>
+      </div>
+
+      <!-- Section des filtres -->
+      <div id="filter-section" class="filter-section" style="display: none">
+        <h4 class="filter-title">Filtres</h4>
+        <div class="filter-group">
+          <div class="filter-switch-container">
+            <span class="filter-switch-label">Disponibilité</span>
+            <label class="switch">
+              <input checked="" type="checkbox" id="available-only" />
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+        <div class="filter-group">
+          <label class="filter-label">Puissance minimale (kW)</label>
+          <input
+            type="number"
+            id="min-power"
+            class="filter-input"
+            placeholder="Ex: 50"
+          />
+        </div>
+        <div class="filter-group">
+          <label class="filter-label">Type de connecteur</label>
+          <select id="connector-type" class="filter-input">
+            <option value="">Tous</option>
+            <option value="SAE J1772">SAE J1772</option>
+            <option value="Mennekes">Mennekes</option>
+            <option value="Scame">Scame</option>
+            <option value="CHAdeMO">CHAdeMO</option>
+            <option value="Combo 1">Combo 1</option>
+            <option value="Combo 2">Combo 2</option>
+            <option value="Tesla">Tesla</option>
+          </select>
+          <button id="apply-filters" class="apply-button">
+            Appliquer les filtres
+          </button>
+        </div>
+      </div>
+      <div class="view-tabs" style="justify-content: center" role="tablist">
+        <a
+          href="/stations/add_station/{{username}}"
+          role="tab"
+          class="tab-button"
+          style="text-decoration: none"
+          >ajouter station</a
+        >
+      </div>
+    </section>
+
+    <section class="stations-list">
+      <div class="list-header">
+        <h2 class="list-title">Liste des stations</h2>
+      </div>
+      {% for station in stations %}
+      <article
+        class="station-card"
+        data-latitude="{{ station.latitude }}"
+        data-longitude="{{ station.longitude }}"
+        data-connector-type="{{ station.connector_types }}"
+      >
+        <div class="station-info">
+          <div class="station-header">
+            <h3 class="station-name">Station {{station.nom}}</h3>
+            {% if station.disponibilite == 1 %}
+            <span class="status-badge available">Disponible</span>
+            {% else %}
+            <span class="status-badge unavailable">indisponible</span>
+            {% endif %}
+          </div>
+          <div class="station-address">
+            <img
+              src="https://cdn.builder.io/api/v1/image/assets/bf3934ef47c34024b3445b90b3c37150/5dd68f39febd49499f215603e939a765ec3237ce?placeholderIfAbsent=true"
+              alt="Location"
+              class="location-icon station-image"
+            />
+            <span>{{station.adresse}}</span>
+          </div>
+          <div class="station-actions">
+            <a
+              style="text-decoration: none"
+              href="/stations/update_station/{{station.ID_Station}}/{{username}}"
+              class="details-button"
+            >
+              <span class="circle1"></span>
+              <span class="circle2"></span>
+              <span class="circle3"></span>
+              <span class="circle4"></span>
+              <span class="circle5"></span>
+              <span class="text2">Modifier la station</span>
+            </a>
+            <a
+              style="text-decoration: none"
+              href="/stations/statistics/{{station.ID_Station}}/{{username}}/"
+              class="statistique-button"
+            >
+              <span class="circle1"></span>
+              <span class="circle2"></span>
+              <span class="circle3"></span>
+              <span class="circle4"></span>
+              <span class="circle5"></span>
+              <span class="text2">statistique</span>
+            </a>
+
+            <a
+              style="text-decoration: none"
+              href="/stations/delete_station/{{station.ID_Station}}/{{username}}"
+              class="delete-button"
+            >
+              <svg class="delete-svgIcon" viewBox="0 0 448 512">
+                <path
+                  d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"
+                ></path>
+              </svg>
+            </a>
+          </div>
+        </div>
+        <div class="station-capacity">
+          <img
+            src="https://cdn.builder.io/api/v1/image/assets/bf3934ef47c34024b3445b90b3c37150/4e6a96f70beb7d0788031fe35363f158f59f7528?placeholderIfAbsent=true"
+            alt="Charging"
+            class="charging-icon station-image"
+          />
+          <span>{{note}}/5 points • {{station.puissance}} kW</span>
+        </div>
+      </article>
+      {% endfor %}
+    </section>
+  </main>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const searchInput = document.getElementById("search-input");
+    const filterButton = document.getElementById("filter-button");
+    const filterSection = document.getElementById("filter-section");
+    const applyFiltersButton = document.getElementById("apply-filters");
+    const availableOnly = document.getElementById("available-only");
+    const minPowerInput = document.getElementById("min-power");
+    const stationCards = document.querySelectorAll(".station-card");
+
+    // Gestionnaire d'erreur pour les images
+    const stationImages = document.querySelectorAll(".station-image");
+    stationImages.forEach(function (img) {
+      img.onerror = function () {
+        this.src = placeholderImageUrl;
+        this.onerror = null;
+      };
+    });
+
+    // Afficher/masquer la section des filtres
+    filterButton.addEventListener("click", function () {
+      filterSection.style.display =
+        filterSection.style.display === "none" ? "block" : "none";
+    });
+
+    // Fonction de recherche
+    searchInput.addEventListener("input", function () {
+      const searchTerm = searchInput.value.toLowerCase();
+      stationCards.forEach((card) => {
+        const stationName = card
+          .querySelector(".station-name")
+          .textContent.toLowerCase();
+        const stationAddress = card
+          .querySelector(".station-address span")
+          .textContent.toLowerCase();
+        if (
+          stationName.includes(searchTerm) ||
+          stationAddress.includes(searchTerm)
+        ) {
+          card.style.display = "block";
+        } else {
+          card.style.display = "none";
+        }
+      });
+    });
+
+    // Fonction de filtre
+    applyFiltersButton.addEventListener("click", function () {
+      const minPower = parseFloat(minPowerInput.value) || 0;
+      const onlyAvailable = availableOnly.checked;
+      const selectedConnector = document.getElementById("connector-type").value;
+
+      console.log("Filtrage avec: ", { minPower, onlyAvailable, selectedConnector });
+
+      stationCards.forEach((card) => {
+        // Extraction correcte de la puissance
+        const powerText = card.querySelector(".station-capacity span").textContent;
+        const powerMatch = powerText.match(/(\d+(\.\d+)?)\s*kW/);
+        const stationPower = powerMatch ? parseFloat(powerMatch[1]) : 0;
+        
+        // Vérification de la disponibilité
+        const isAvailable = card.querySelector(".status-badge").classList.contains("available");
+        
+        // Récupération des types de connecteurs
+        const stationConnector = card.dataset.connectorType || "";
+
+        let showCard = true;
+
+        // Filtre de disponibilité
+        if (onlyAvailable && !isAvailable) {
+          showCard = false;
+        }
+
+        // Filtre de puissance
+        if (stationPower < minPower) {
+          showCard = false;
+        }
+
+        // Filtre de type de connecteur
+        if (selectedConnector && !stationConnector.includes(selectedConnector)) {
+          showCard = false;
+        }
+
+        // Affichage ou masquage de la carte
+        card.style.display = showCard ? "block" : "none";
+        
+        // Log pour le débogage
+        console.log(`Station (${card.querySelector(".station-name").textContent}): puissance=${stationPower}, disponible=${isAvailable}, connecteur=${stationConnector}, affichée=${showCard}`);
+      });
+      
+      // Message si aucune station ne correspond aux critères
+      const visibleCards = Array.from(stationCards).filter(card => card.style.display !== "none");
+      if (visibleCards.length === 0) {
+        alert("Aucune station ne correspond à vos critères de recherche.");
+      } else {
+        console.log(`${visibleCards.length} stations correspondent aux critères.`);
+      }
+    });
+
+    // Tri par proximité
+    const proximityButton = document.getElementById("proximity-button");
+
+    proximityButton.addEventListener("click", function () {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          function (position) {
+            const userLat = position.coords.latitude;
+            const userLon = position.coords.longitude;
+
+            stationCards.forEach((card) => {
+              const stationLat = parseFloat(card.dataset.latitude);
+              const stationLon = parseFloat(card.dataset.longitude);
+
+              // Calculer la distance entre l'utilisateur et la station
+              const distance = calculateDistance(
+                userLat,
+                userLon,
+                stationLat,
+                stationLon
+              );
+
+              // Ajouter la distance comme attribut de données
+              card.dataset.distance = distance;
+            });
+
+            // Trier les stations par distance croissante
+            const stationList = document.querySelector(".stations-list");
+            const stations = Array.from(
+              stationList.querySelectorAll(".station-card")
+            );
+
+            stations.sort((a, b) => {
+              return (
+                parseFloat(a.dataset.distance) - parseFloat(b.dataset.distance)
+              );
+            });
+
+            // Réorganiser les stations dans le DOM
+            stations.forEach((station) => stationList.appendChild(station));
+          },
+          function (error) {
+            alert("Impossible de récupérer votre position.");
+          }
+        );
+      } else {
+        alert(
+          "La géolocalisation n'est pas prise en charge par votre navigateur."
+        );
+      }
+    });
+
+    // Fonction pour calculer la distance entre deux points géographiques
+    function calculateDistance(lat1, lon1, lat2, lon2) {
+      const R = 6371; // Rayon de la Terre en km
+      const dLat = ((lat2 - lat1) * Math.PI) / 180;
+      const dLon = ((lon2 - lon1) * Math.PI) / 180;
+      const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos((lat1 * Math.PI) / 180) *
+          Math.cos((lat2 * Math.PI) / 180) *
+          Math.sin(dLon / 2) *
+          Math.sin(dLon / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return R * c; // Distance en km
+    }
+  });
+</script>
+{% endblock content %}

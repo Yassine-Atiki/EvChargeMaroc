@@ -1,0 +1,283 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+{% block content %}
+{% load static %}
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmation de Réservation</title>
+    <link rel="stylesheet" href="{% static 'css/reservation_confirmation.css'%}" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Bibliothèques pour le PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+
+<div class="page-container">
+    <main class="main-content">
+        <div class="confirmation-container">
+            <!-- En-tête de confirmation -->
+            <div class="confirmation-header">
+                <div class="confirmation-icon">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none">
+                        <path d="M22 11.0857V12.0057C21.9988 14.1621 21.3005 16.2604 20.0093 17.9875C18.7182 19.7147 16.9033 20.9782 14.8354 21.5896C12.7674 22.201 10.5573 22.1276 8.53447 21.3803C6.51168 20.633 4.78465 19.2518 3.61096 17.4428C2.43727 15.6338 1.87979 13.4938 2.02168 11.342C2.16356 9.19029 2.99721 7.14205 4.39828 5.5028C5.79935 3.86354 7.69279 2.72111 9.79619 2.24587C11.8996 1.77063 14.1003 1.98806 16.07 2.86572" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M22 4L12 14.01L9 11.01" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <h1 class="confirmation-title">Réservation confirmée !</h1>
+                <p class="confirmation-subtitle">Votre réservation a été effectuée avec succès. Vous recevrez une confirmation par email.</p>
+            </div>
+
+            <div class="confirmation-details">
+                <!-- Section des détails de réservation -->
+                <div class="confirmation-section">
+                    <h2 class="section-title">Détails de la réservation</h2>
+                    <div class="details-grid">
+                        <div class="detail-item">
+                            <span class="detail-label">Numéro de réservation</span>
+                            <span class="detail-value" id="reservation-id">{{ reservation.get_formatted_id }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Station</span>
+                            <span class="detail-value">{{ station.nom }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Adresse</span>
+                            <span class="detail-value">{{ station.adresse }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Date et heure</span>
+                            <span class="detail-value" id="reservation-date">{{ reservation.time_start }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Durée</span>
+                            <span class="detail-value" id="duration-value">{{ reservation.duration }} heure(s)</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Puissance</span>
+                            <span class="detail-value" id="power-value">{{ reservation.power }} kW</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Connecteur</span>
+                            <span class="detail-value">{{ station.connector_types }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Montant payé</span>
+                            <span class="detail-value" id="price-value">{{ reservation.price }} DH</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section d'instructions -->
+                <div class="confirmation-section">
+                    <h2 class="section-title">Instructions</h2>
+                    <div class="instructions-list">
+                        <div class="instruction-item">
+                            <div class="instruction-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <polyline points="12 6 12 12 16 14"></polyline>
+                                </svg>
+                            </div>
+                            <div class="instruction-content">
+                                <h3 class="instruction-title">Arrivez à l'heure</h3>
+                                <p class="instruction-text">Veuillez arriver à la station 5 minutes avant l'heure de votre réservation.</p>
+                            </div>
+                        </div>
+                        <div class="instruction-item">
+                            <div class="instruction-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="4" width="18" height="16" rx="2"></rect>
+                                    <path d="M7 9h10M7 13h7M7 17h4"></path>
+                                </svg>
+                            </div>
+                            <div class="instruction-content">
+                                <h3 class="instruction-title">Présentez votre QR code</h3>
+                                <p class="instruction-text">Utilisez le QR code ci-dessous pour déverrouiller la borne de recharge.</p>
+                            </div>
+                        </div>
+                        <div class="instruction-item">
+                            <div class="instruction-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                                </svg>
+                            </div>
+                            <div class="instruction-content">
+                                <h3 class="instruction-title">Assistance sur place</h3>
+                                <p class="instruction-text">En cas de problème, contactez le personnel de la station ou notre service client au 0800-123-456.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section du QR Code -->
+                <div class="qr-code-section">
+                    <h2 class="section-title">Votre QR code</h2>
+                    <div class="qr-code-container">
+                        <img src="{% url 'stations:generate_qr_code' reservation.ID_Reservation %}" alt="QR Code" class="qr-code">
+                        <p class="qr-code-info">Présentez ce QR code à la borne pour commencer votre session de recharge.</p>
+                    </div>
+                </div>
+
+                <!-- Boutons d'action -->
+                <div class="confirmation-actions">
+                    <a href="{% url 'stations:user_reservations' request.user.username %}" class="btn-primary">Voir mes réservations</a>
+                    <a href="{% url 'stations:station_List_ProprietaireVE' %}" class="btn-secondary">Retour aux stations</a>
+                    <button class="btn-secondary" id="download-btn">Télécharger PDF</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Récupération des données d'URL (si nécessaire)
+    const urlParams = new URLSearchParams(window.location.search);
+    const reservationId = urlParams.get('id');
+    const date = urlParams.get('date');
+    const time = urlParams.get('time');
+    const duration = urlParams.get('duration');
+    const power = urlParams.get('power');
+    const price = urlParams.get('price');
+
+    // Mise à jour des données si elles sont présentes dans l'URL
+    if (reservationId) {
+        document.getElementById('reservation-id').textContent = reservationId;
+    }
+    if (date && time) {
+        document.getElementById('reservation-date').textContent = `${date}, ${time}`;
+    }
+    if (duration) {
+        document.getElementById('duration-value').textContent = `${duration} heure(s)`;
+    }
+    if (power) {
+        document.getElementById('power-value').textContent = `${power} kW`;
+    }
+    if (price) {
+        document.getElementById('price-value').textContent = `${price} DH`;
+    }
+
+    // Ajout du bouton Calendrier
+    const addToCalendarBtn = document.createElement('button');
+    addToCalendarBtn.className = 'btn-secondary';
+    addToCalendarBtn.textContent = 'Ajouter au calendrier';
+    addToCalendarBtn.addEventListener('click', function() {
+        alert("Fonctionnalité d'ajout au calendrier à implémenter");
+    });
+    document.querySelector('.confirmation-actions').appendChild(addToCalendarBtn);
+
+    // Ajout du bouton Partage 
+    if (navigator.share) {
+        const shareBtn = document.createElement('button');
+        shareBtn.className = 'btn-secondary';
+        shareBtn.textContent = 'Partager';
+        shareBtn.addEventListener('click', function() {
+            navigator.share({
+                title: 'Ma réservation de borne de recharge',
+                text: `J'ai réservé une borne à ${date || document.getElementById('reservation-date').textContent} pour ${duration || document.getElementById('duration-value').textContent.split(' ')[0]} heure(s)`,
+                url: window.location.href
+            }).catch(error => console.log('Erreur de partage', error));
+        });
+        document.querySelector('.confirmation-actions').appendChild(shareBtn);
+    }
+
+    // Fonction de téléchargement du PDF
+    const downloadBtn = document.getElementById('download-btn');
+    if (downloadBtn) {
+        downloadBtn.addEventListener('click', function() {
+            // Initialisation de jsPDF
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Récupération des informations de réservation
+            const reservationId = document.getElementById('reservation-id').textContent;
+            const station = document.querySelector('.detail-item:nth-child(2) .detail-value').textContent;
+            const address = document.querySelector('.detail-item:nth-child(3) .detail-value').textContent;
+            const dateTime = document.getElementById('reservation-date').textContent;
+            const duration = document.getElementById('duration-value').textContent;
+            const power = document.getElementById('power-value').textContent;
+            const connector = document.querySelector('.detail-item:nth-child(7) .detail-value').textContent;
+            const price = document.getElementById('price-value').textContent;
+            
+            // Ajout du titre et logo
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(24);
+            doc.setTextColor(22, 163, 74); // Couleur verte pour le titre
+            doc.text("EV Charge Maroc", 105, 15, { align: 'center' });
+            
+            // Logo simple
+            doc.setDrawColor(22, 163, 74);
+            doc.setFillColor(22, 163, 74);
+            doc.circle(20, 15, 8, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(10);
+            doc.text("EV", 20, 17, { align: 'center' });
+            
+            // Réinitialisation des couleurs
+            doc.setTextColor(0, 0, 0);
+            
+            // Titre du document
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(20);
+            doc.text("Confirmation de Réservation", 105, 30, { align: 'center' });
+            
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(12);
+            doc.text("Votre réservation a été confirmée avec succès.", 105, 40, { align: 'center' });
+            
+            // Détails de la réservation
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(16);
+            doc.text("Détails de la réservation", 20, 55);
+            
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(12);
+            doc.text("Numéro de réservation: " + reservationId, 20, 65);
+            doc.text("Station: " + station, 20, 75);
+            doc.text("Adresse: " + address, 20, 85);
+            doc.text("Date et heure: " + dateTime, 20, 95);
+            doc.text("Durée: " + duration, 20, 105);
+            doc.text("Puissance: " + power, 20, 115);
+            doc.text("Connecteur: " + connector, 20, 125);
+            doc.text("Montant payé: " + price, 20, 135);
+            
+            // Instructions
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(16);
+            doc.text("Instructions", 20, 155);
+            
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(12);
+            doc.text("1. Veuillez arriver à la station 5 minutes avant l'heure de votre réservation.", 20, 165);
+            doc.text("2. Présentez votre QR code à la borne pour déverrouiller la borne de recharge.", 20, 175);
+            doc.text("3. En cas de problème, contactez notre service client au 0800-123-456.", 20, 185);
+            
+            // Ajout du QR code
+            const qrCodeImg = document.querySelector('.qr-code');
+            if (qrCodeImg && qrCodeImg.complete) {
+                html2canvas(qrCodeImg).then(canvas => {
+                    const imgData = canvas.toDataURL('image/png');
+                    doc.addImage(imgData, 'PNG', 75, 195, 60, 60);
+                    doc.text("Présentez ce QR code à la borne pour commencer votre session de recharge.", 105, 265, { align: 'center' });
+                    
+                    // Pied de page
+                    doc.setFontSize(10);
+                    doc.setTextColor(100, 116, 139);
+                    doc.text("© EV Charge Maroc - La solution de recharge pour votre véhicule électrique", 105, 280, { align: 'center' });
+                    
+                    // Téléchargement
+                    doc.save("reservation-" + reservationId + ".pdf");
+                });
+            } else {
+                // Télécharger sans QR code si indisponible
+                doc.setFontSize(10);
+                doc.setTextColor(100, 116, 139);
+                doc.text("© EV Charge Maroc - La solution de recharge pour votre véhicule électrique", 105, 280, { align: 'center' });
+                doc.save("reservation-" + reservationId + ".pdf");
+            }
+        });
+    }
+});
+</script>
+{% endblock content %}

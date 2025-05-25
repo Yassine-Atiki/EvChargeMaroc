@@ -1,0 +1,199 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+{% block content %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profil - EV Charge Maroc</title>
+    <link rel="stylesheet" href="{% static 'css/profile.css' %}" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+
+    <main class="main-content">
+      <section class="page-header">
+        <div class="security-icon-container">
+          <svg
+            class="shield-icon"
+            width="24"
+            height="24"
+            viewBox="0 0 25 25"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M20.2105 13.8901C20.2105 18.8901 16.7105 21.3901 12.5505 22.8401C12.3327 22.9139 12.096 22.9104 11.8805 22.8301C7.71051 21.3901 4.21051 18.8901 4.21051 13.8901V6.8901C4.21051 6.62488 4.31587 6.37053 4.5034 6.18299C4.69094 5.99546 4.94529 5.8901 5.21051 5.8901C7.21051 5.8901 9.71051 4.6901 11.4505 3.1701C11.6624 2.9891 11.9319 2.88965 12.2105 2.88965C12.4892 2.88965 12.7587 2.9891 12.9705 3.1701C14.7205 4.7001 17.2105 5.8901 19.2105 5.8901C19.4757 5.8901 19.7301 5.99546 19.9176 6.18299C20.1052 6.37053 20.2105 6.62488 20.2105 6.8901V13.8901Z"
+              stroke="#16A34A"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            ></path>
+          </svg>
+        </div>
+        <h2 class="page-title">Profil</h2>
+        <a href="{% url 'Home:Home' user.username %}" class="back-button">Retour</a>
+      </section>
+
+      <div class="profile-container">
+        <aside class="profile-sidebar">
+          <div class="sidebar-content">
+            <div class="avatar-container">
+              <svg
+                class="user-icon"
+                width="24"
+                height="24"
+                viewBox="0 0 25 25"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M19.2105 21.8901V19.8901C19.2105 18.8293 18.7891 17.8119 18.0389 17.0617C17.2888 16.3116 16.2714 15.8901 15.2105 15.8901H9.21051C8.14964 15.8901 7.13223 16.3116 6.38208 17.0617C5.63194 17.8119 5.21051 18.8293 5.21051 19.8901V21.8901"
+                  stroke="#16A34A"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                ></path>
+                <path
+                  d="M12.2105 11.8901C14.4196 11.8901 16.2105 10.0993 16.2105 7.89014C16.2105 5.681 14.4196 3.89014 12.2105 3.89014C10.0014 3.89014 8.21051 5.681 8.21051 7.89014C8.21051 10.0993 10.0014 11.8901 12.2105 11.8901Z"
+                  stroke="#16A34A"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                ></path>
+              </svg>
+            </div>
+            <br><h3 class="user-name">{{user.username}}</h3><br>
+            <p class="user-role">{{user_type}}</p>
+            <hr class="sidebar-divider" />
+            <nav class="profile-nav">
+              <a href="#" class="profile-nav-link active" id="profile-tab"
+                >Informations personnelles</a
+              >
+              <a href="#" class="profile-nav-link" id="security-tab" >Sécurité</a>
+            </nav>
+          </div>
+        </aside>
+
+        <section class="profile-content">
+          <div id="profile-card">
+          <header class="section-header">
+            <h3 class="section-title">Informations personnelles</h3>
+            <p class="section-description">
+              Mettez à jour vos informations personnelles
+            </p>
+            {% if error %}
+          <p style="color: red;">{{ error }}</p>
+        {% endif %}
+        {% if success %}
+          <p style="color: green;">{{ success }}</p>
+        {% endif %}
+          </header>
+
+          <form class="profile-form" action="{% url 'users:profile' user.username %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="update_info" />
+            <div class="form-row">
+              <div class="form-group">
+                <label for="first_name" class="form-label">Prénom</label>
+                <input type="text" id="first_name" value="{{user.first_name}}" required class="form-input" />
+              </div>
+              <div class="form-group">
+                <label for="last_name" class="form-label">Nom</label>
+                <input type="text" id="last_name" value="{{user.last_name}}" class="form-input" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="username" class="form-label">Username</label>
+              <input
+                type="text"
+                name="username"
+                id="username"
+                required
+                value="{{user.username}}"
+                class="form-input"
+              />
+            </div><br>
+
+            
+            <div class="form-group">
+              <label for="CIN" class="form-label"
+                >CIN (Carte d'Identité Nationale)</label
+              >
+              <input
+                type="text"
+                name="CIN"
+                id="CIN"
+                minlength="8"
+                maxlength="8"
+                value="{{user.CIN}}"
+                required
+                class="form-input"
+              />
+            </div><br>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" id="email" value="{{user.email}}" required class="form-input" />
+              </div>
+
+              <div class="form-group">
+                <label for="phone_number" class="form-label">Téléphone</label>
+                <input type="tel" name="phone_number" id="phone_number" value="{{user.phone_number}}" minlength="10"
+                maxlength="10"
+                required class="form-input" />
+              </div>
+
+            </div> <!-- Closing the form-row div -->
+            
+            <br><br><button type="submit" class="submit-button">
+              Enregistrer les modifications
+            </button>
+          </div>
+        </form>
+        <form class="profile-form" action="{% url 'users:profile' user.username %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="update_password" />
+            
+          <div id="security-card" style="display: none;">
+            <header class="section-header">
+              <h3 class="section-title">Sécurité</h3>
+              <p class="section-description">
+                Mettez à jour votre mot de passe
+              </p>
+            </header><br><br>
+            <input type="hidden" name="action" value="update_password" />
+            <div class="form-group">
+              <label for="last_password" class="form-label">Mot de passe actuel</label>
+              <input type="password" name="last_password" id="last_password" minlength="8" required class="form-input" />
+            </div><br>
+            <div class="form-group">
+              <label for="new_password" class="form-label">Nouveau mot de passe</label>
+              <input type="password" name="new_password" id="new_password" minlength="8" required class="form-input" />
+            </div><br>
+            <div class="form-group">
+              <label for="confirm_password" class="form-label">Confirmer le mot de passe</label>
+              <input type="password" name="confirm_password" id="confirm_password" minlength="8" required class="form-input" />
+            </div>
+            <br><br><button type="submit" class="submit-button">
+              Enregistrer le mot de passe
+            </button>
+          </div>
+          </div> 
+          </form>
+        </section>
+      </div>
+    </main>
+
+  </body>
+</html>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="{% static 'js/profile.js' %}"></script>
+{% endblock content %}

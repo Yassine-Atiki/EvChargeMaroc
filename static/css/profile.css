@@ -1,0 +1,372 @@
+/* Base styles */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  
+  body {
+    font-family: "Inter", sans-serif;
+    background-color: #fff;
+  }
+  
+  /* Main content styles */
+  .main-content {
+    padding-top: 65px;
+    margin-bottom: 60px;
+  }
+  
+  .page-header {
+    display: flex;
+    align-items: center;
+    padding: 32px;
+    gap: 8px;
+  }
+  
+  .shield-icon {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .page-title {
+    font-size: 30px;
+    font-weight: 700;
+  }
+  
+  .back-button {
+    margin-left: auto;
+    padding: 8px 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    color: #000;
+    font-size: 14px;
+    text-decoration: none;
+  }
+  
+  /* Profile container */
+  .profile-container {
+    display: flex;
+    gap: 24px;
+    padding: 0 32px;
+  }
+  
+  /* Profile sidebar */
+  .profile-sidebar {
+    width: 277px;
+  }
+  
+  .sidebar-content {
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 24px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    background-color: #fff;
+  }
+  
+  .avatar-container {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    margin: 0 auto 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(22, 163, 74, 0.1);
+  }
+  
+  .user-icon {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .user-name {
+    font-size: 20px;
+    font-weight: 700;
+    text-align: center;
+  }
+  
+  .user-role {
+    color: #64748b;
+    font-size: 14px;
+    text-align: center;
+    margin-top: 4px;
+  }
+  
+  .sidebar-divider {
+    height: 1px;
+    margin: 16px 0;
+    background-color: #e2e8f0;
+    border: none;
+  }
+  
+  .profile-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .profile-nav-link {
+    padding: 10px;
+    color: #000;
+    font-size: 14px;
+    text-decoration: none;
+    text-align: center;
+    border-radius: 6px;
+    display: block;
+  }
+  
+  .profile-nav-link.active {
+    background-color: rgba(22, 163, 74, 0.1);
+    color: #16a34a;
+  }
+  
+  /* Profile content */
+  .profile-content {
+    flex: 1;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 24px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    background-color: #fff;
+  }
+  
+  .section-title {
+    font-size: 24px;
+    font-weight: 600;
+    letter-spacing: -0.6px;
+  }
+  
+  .section-description {
+    color: #64748b;
+    font-size: 14px;
+    margin-top: 6px;
+  }
+  
+  /* Form styles */
+  .profile-form {
+    margin-top: 24px;
+  }
+  
+  .form-row {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 24px;
+  }
+  
+  .form-group {
+    flex: 1;
+  }
+  
+  .full-width {
+    width: 100%;
+    margin-bottom: 24px;
+  }
+  
+  .form-label {
+    color: #000;
+    font-size: 14px;
+    margin-bottom: 8px;
+    display: block;
+  }
+  
+  .form-input {
+    width: 100%;
+    height: 40px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 0 12px;
+    font-size: 14px;
+  }
+  
+  .form-help-text {
+    color: #64748b;
+    font-size: 12px;
+    margin-top: 8px;
+  }
+  
+  .submit-button {
+    color: #fff1f2;
+    padding: 10px 24px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    background-color: #16a34a;
+  }
+  
+
+  /* Responsive styles */
+  @media (max-width: 991px) {
+    .profile-container {
+      flex-direction: column;
+    }
+  
+    .profile-sidebar {
+      width: 100%;
+    }
+  
+    .sidebar-content {
+      max-width: 400px;
+      margin: 0 auto;
+    }
+  }
+  
+  @media (max-width: 640px) {
+    .main-nav {
+      display: none;
+    }
+  
+    .form-row {
+      flex-direction: column;
+    }
+  
+    .form-group {
+      width: 100%;
+    }
+  }
+  
+  /* Media queries améliorées pour responsive */
+  @media (max-width: 1024px) {
+    .profile-container {
+      padding: 30px;
+      max-width: 900px;
+    }
+    
+    .user-info {
+      padding: 24px;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .profile-container {
+      padding: 24px;
+      margin: 24px auto;
+    }
+    
+    .user-header {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 20px;
+    }
+    
+    .user-avatar {
+      width: 100px;
+      height: 100px;
+    }
+    
+    .user-details {
+      align-items: center;
+    }
+    
+    .user-actions {
+      margin-top: 20px;
+      width: 100%;
+      justify-content: center;
+    }
+    
+    .profile-tabs {
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+    }
+    
+    .tab-button {
+      font-size: 14px;
+      padding: 10px 16px;
+    }
+    
+    .user-info {
+      padding: 20px;
+    }
+    
+    .info-grid {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .profile-container {
+      padding: 16px;
+      margin: 16px auto;
+      border-radius: 8px;
+    }
+    
+    .user-name {
+      font-size: 22px;
+    }
+    
+    .user-email {
+      font-size: 14px;
+    }
+    
+    .user-type {
+      font-size: 13px;
+      padding: 4px 8px;
+    }
+    
+    .profile-tabs {
+      overflow-x: auto;
+      padding-bottom: 8px;
+      justify-content: flex-start;
+    }
+    
+    .tab-button {
+      font-size: 13px;
+      padding: 8px 14px;
+      min-width: 80px;
+      white-space: nowrap;
+    }
+    
+    .user-info {
+      padding: 16px;
+    }
+    
+    .info-group {
+      margin-bottom: 16px;
+    }
+    
+    .info-label {
+      font-size: 13px;
+    }
+    
+    .info-value {
+      font-size: 14px;
+    }
+    
+    .edit-button {
+      padding: 6px 12px;
+      font-size: 13px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .profile-container {
+      padding: 12px;
+      margin: 12px auto;
+    }
+    
+    .user-avatar {
+      width: 80px;
+      height: 80px;
+    }
+    
+    .user-name {
+      font-size: 20px;
+    }
+    
+    .user-actions {
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .edit-button {
+      width: 100%;
+    }
+    
+    .info-group {
+      padding: 12px;
+    }
+  }
+  

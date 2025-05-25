@@ -1,0 +1,383 @@
+{% load custom_filters %}
+<!DOCTYPE html>
+<html lang="fr">
+  {% load static %}
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EV Charge Maroc</title>
+
+    <link rel="stylesheet" href="{% static 'css/base.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/responsive.css' %}" />
+    {% block extrahead %}{% endblock %}
+  </head>
+  <body>
+    {% if user.is_authenticated %}
+    <header class="main-header">
+      <div class="header-container">
+        <a href="{% url 'Home:Home' user.username %}"
+          ><img
+            src="https://cdn.builder.io/api/v1/image/assets/TEMP/ebf4b47c6a582bb1f614b2a4ae44131577e371ac"
+            alt="Logo"
+            class="logo"
+        /></a>
+        <h1 class="brand-name">EV Charge Maroc</h1>
+        
+        <button class="navbar-toggle" id="navbar-toggle">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+        
+        <nav class="main-nav" id="main-nav">
+          <a href="{% url 'Home:Home' user.username %}" class="nav-link"
+            >Accueil</a
+          >
+          {% if user|is_instance_of:"users.models.Fournisseur" %}
+          <a href="{% url 'map:map' %}" class="nav-link">Map</a>
+          <a
+            href="{% url 'stations:station_List_Fournisseur' user.username %}"
+            class="nav-link"
+            >Stations</a
+          >
+          {% else %}
+          <a href="{% url 'map:map' %}" class="nav-link">Map</a>
+          <a
+            href="{% url 'stations:station_List_ProprietaireVE' %}"
+            class="nav-link"
+            >Stations</a
+          >
+          <a
+            href="{% url 'stations:user_reservations' user.username %}"
+            class="nav-link"
+            >Reservations</a
+          >
+          {% endif %}
+        </nav>
+        <div class="header-actions">
+          <i class="ti ti-sun"></i>
+          {% if user|is_instance_of:"users.models.Fournisseur" %}
+          <a
+            style="text-decoration: none"
+            href="/users/profile/{{ user.username }}"
+            id="btn-message"
+            class="button-message hide-sm-down"
+          >
+            <div class="content-avatar">
+              <div class="status-user"></div>
+              <div class="avatar">
+                <svg
+                  class="user-img"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M12,12.5c-3.04,0-5.5,1.73-5.5,3.5s2.46,3.5,5.5,3.5,5.5-1.73,5.5-3.5-2.46-3.5-5.5-3.5Zm0-.5c1.66,0,3-1.34,3-3s-1.34-3-3-3-3,1.34-3,3,1.34,3,3,3Z"
+                  ></path>
+                </svg>
+              </div>
+            </div>
+            <div class="notice-content">
+              <div class="username">
+                {{ user.last_name }} {{ user.first_name }}
+              </div>
+              <div class="lable-message">
+                profile<span class="number-message">F</span>
+              </div>
+              <div class="user-id">@{{ user.username }}</div>
+            </div>
+          </a>
+          <!-- Version mobile du bouton profil -->
+          <a
+            href="/users/profile/{{ user.username }}"
+            class="nav-link show-sm-down hide-md"
+            style="display: none;"
+          >
+            Profil
+          </a>
+          {% else %}
+          <a
+            style="text-decoration: none"
+            href="/users/profile/{{ user.username }}"
+            id="btn-message"
+            class="button-message hide-sm-down"
+          >
+            <div class="content-avatar">
+              <div class="status-user"></div>
+              <div class="avatar">
+                <svg
+                  class="user-img"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M12,12.5c-3.04,0-5.5,1.73-5.5,3.5s2.46,3.5,5.5,3.5,5.5-1.73,5.5-3.5-2.46-3.5-5.5-3.5Zm0-.5c1.66,0,3-1.34,3-3s-1.34-3-3-3-3,1.34-3,3,1.34,3,3,3Z"
+                  ></path>
+                </svg>
+              </div>
+            </div>
+            <div class="notice-content">
+              <div class="username">
+                {{ user.last_name }} {{ user.first_name }}
+              </div>
+              <div class="lable-message">
+                profile<span class="number-message">U</span>
+              </div>
+              <div class="user-id">@{{ user.username }}</div>
+            </div>
+          </a>
+          <!-- Version mobile du bouton profil -->
+          <a
+            href="/users/profile/{{ user.username }}"
+            class="nav-link show-sm-down hide-md"
+            style="display: none;"
+          >
+            Profil
+          </a>
+          {% endif %}
+          <!-- From Uiverse.io by MUJTABA201566 -->
+          <a
+            style="text-decoration: none; display: flex; gap: 10px"
+            href="{% url 'Home:logout' %}"
+            class="Btn hide-sm-down"
+          >
+            <div class="sign">
+              <svg viewBox="0 0 512 512">
+                <path
+                  d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z"
+                ></path>
+              </svg>
+            </div>
+
+            <div class="text">Déconnexion</div>
+          </a>
+          <!-- Version mobile du bouton déconnexion -->
+          <a
+            href="{% url 'Home:logout' %}"
+            class="nav-link show-sm-down hide-md"
+            style="display: none;"
+          >
+            Déconnexion
+          </a>
+        </div>
+      </div>
+    </header>
+    {% endif %} {% if not user.is_authenticated %}
+    <header class="main-header">
+      <div class="header-container">
+        <a href="{% url 'Home:Home' %}"
+          ><img
+            src="https://cdn.builder.io/api/v1/image/assets/TEMP/ebf4b47c6a582bb1f614b2a4ae44131577e371ac"
+            alt="Logo"
+            class="logo"
+        /></a>
+        <h1 class="brand-name">EV Charge Maroc</h1>
+        
+        <button class="navbar-toggle" id="navbar-toggle">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+        
+        <nav class="main-nav" id="main-nav">
+          <a href="{% url 'Home:Home' %}" class="nav-link">Accueil</a>
+          <a href="{% url 'map:map' %}" class="nav-link">Map</a>
+          <a href="{% url 'users:login' %}" class="nav-link">Stations</a>
+          <a href="{% url 'users:login' %}" class="nav-link">Reservations</a>
+        </nav>
+        <div class="header-actions">
+          <i class="ti ti-sun"></i>
+          <!-- From Uiverse.io by adamgiebl -->
+          <a
+            style="text-decoration: none"
+            href="{% url 'users:login' %}"
+            class="cssbuttons-io-button hide-sm-down"
+          >
+            Connexion
+            <div class="icon">
+              <svg
+                height="24"
+                width="24"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path d="M0 0h24v24H0z" fill="none"></path>
+                <path
+                  d="M16.172 11l-5.364-5.364 1.414-1.414L20 12l-7.778 7.778-1.414-1.414L16.172 13H4v-2z"
+                  fill="currentColor"
+                ></path>
+              </svg>
+            </div>
+          </a>
+          <!-- Version mobile du bouton connexion -->
+          <a
+            href="{% url 'users:login' %}"
+            class="nav-link show-sm-down hide-md"
+            style="display: none;"
+          >
+            Connexion
+          </a>
+        </div>
+      </div>
+    </header>
+    {% endif %} {% block content %} {% endblock content %}
+
+    <footer class="main-footer">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <div style="display: flex; gap: 5px">
+            <img
+              src="https://cdn.builder.io/api/v1/image/assets/TEMP/ebf4b47c6a582bb1f614b2a4ae44131577e371ac"
+              alt="Logo"
+              class="footer-logo"
+            />
+            <h2 class="footer-brand-name">EV Charge Maroc</h2>
+          </div>
+          <p class="footer-description">
+            Système de gestion des stations de recharge
+            <br />
+            de véhicules électriques au Maroc.
+          </p>
+        </div>
+
+        <nav class="footer-nav">
+          <h3 class="footer-nav-title">Liens Rapides</h3>
+          <div class="footer-links">
+            <a href="{% url 'Home:Home' %}" class="footer-link">Accueil</a>
+            <a href="{% url 'map:map' %}" class="footer-link">Map</a>
+            {% if user.is_authenticated %}
+            {% if user|is_instance_of:"users.models.Fournisseur" %}
+            <a href="{% url 'stations:station_List_Fournisseur' user.username %}" class="footer-link">Stations</a>
+            {% else %}
+            <a href="{% url 'stations:station_List_ProprietaireVE' %}" class="footer-link">Stations</a>
+            {% endif %}
+            {% else %}
+            <a href="{% url 'users:login' %}" class="footer-link">Stations</a>
+            {% endif %}
+          </div>
+        </nav>
+
+        <nav class="footer-nav">
+          <h3 class="footer-nav-title">Support</h3>
+          <div class="footer-links">
+            <a href="{% url 'help:faq_list' %}" class="footer-link">FAQ</a>
+            <a href="{% url 'help:support_home' %}" class="footer-link"
+              >Contact</a
+            >
+            <a href="{% url 'help:help_home' %}" class="footer-link"
+              >Centre d'aide</a
+            >
+          </div>
+        </nav>
+
+        <div class="footer-social">
+          <h3 class="footer-nav-title">Suivez-nous</h3>
+          <div class="social-icons">
+            <a href="#" class="social-icon">
+              <svg
+                width="21"
+                height="21"
+                viewBox="0 0 21 21"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M15.5 2.33667H13C11.8949 2.33667 10.8351 2.77566 10.0537 3.55706C9.27233 4.33846 8.83334 5.39827 8.83334 6.50334V9.00334H6.33334V12.3367H8.83334V19.0033H12.1667V12.3367H14.6667L15.5 9.00334H12.1667V6.50334C12.1667 6.28232 12.2545 6.07036 12.4108 5.91408C12.567 5.7578 12.779 5.67 13 5.67H15.5V2.33667Z"
+                  stroke="#020817"
+                  stroke-width="1.66667"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                ></path>
+              </svg>
+            </a>
+            <a href="#" class="social-icon">
+              <svg
+                width="21"
+                height="21"
+                viewBox="0 0 21 21"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M18.8333 4.00336C18.8333 4.00336 18.25 5.75336 17.1667 6.83669C18.5 15.17 9.33332 21.2534 2.16666 16.5034C3.99999 16.5867 5.83332 16.0034 7.16666 14.8367C2.99999 13.5867 0.916657 8.67002 2.99999 4.83669C4.83332 7.00336 7.66666 8.25336 10.5 8.17002C9.74999 4.67002 13.8333 2.67002 16.3333 5.00336C17.25 5.00336 18.8333 4.00336 18.8333 4.00336Z"
+                  stroke="#020817"
+                  stroke-width="1.66667"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                ></path>
+              </svg>
+            </a>
+            <a href="#" class="social-icon">
+              <svg
+                width="21"
+                height="21"
+                viewBox="0 0 21 21"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M14.6667 2.33667H6.33332C4.03214 2.33667 2.16666 4.20215 2.16666 6.50334V14.8367C2.16666 17.1379 4.03214 19.0033 6.33332 19.0033H14.6667C16.9678 19.0033 18.8333 17.1379 18.8333 14.8367V6.50334C18.8333 4.20215 16.9678 2.33667 14.6667 2.33667Z"
+                  stroke="#020817"
+                  stroke-width="1.66667"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                ></path>
+                <path
+                  d="M13.8333 10.1449C13.9362 10.8385 13.8177 11.5468 13.4948 12.1691C13.1719 12.7914 12.661 13.2961 12.0347 13.6113C11.4084 13.9265 10.6987 14.0363 10.0065 13.9249C9.31428 13.8135 8.67481 13.4867 8.17904 12.9909C7.68327 12.4951 7.35645 11.8557 7.24507 11.1634C7.13368 10.4712 7.2434 9.76151 7.55862 9.13524C7.87383 8.50897 8.3785 7.99805 9.00083 7.67513C9.62316 7.35221 10.3315 7.23375 11.025 7.3366C11.7324 7.4415 12.3874 7.77115 12.8931 8.27685C13.3988 8.78255 13.7284 9.43749 13.8333 10.1449Z"
+                  stroke="#020817"
+                  stroke-width="1.66667"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                ></path>
+                <path
+                  d="M15.0833 6.08667H15.0917"
+                  stroke="#020817"
+                  stroke-width="1.66667"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                ></path>
+              </svg>
+            </a>
+            <a href="#" class="social-icon"> </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p class="copyright">© 2025 EV Charge Maroc. Tous droits réservés.</p>
+        <div class="legal-links">
+          <a href="{% url 'Home:privacy_policy' %}" class="legal-link"
+            >Politique de confidentialité</a
+          >
+          <a href="{% url 'Home:terms_of_service' %}" class="legal-link"
+            >Conditions d'utilisation</a
+          >
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      // Script pour le menu burger mobile
+      document.addEventListener('DOMContentLoaded', function() {
+        const navbarToggle = document.getElementById('navbar-toggle');
+        const mainNav = document.getElementById('main-nav');
+        
+        if (navbarToggle && mainNav) {
+          navbarToggle.addEventListener('click', function() {
+            mainNav.classList.toggle('active');
+            this.classList.toggle('active');
+          });
+          
+          // Fermer le menu quand on clique sur un lien
+          const navLinks = mainNav.querySelectorAll('.nav-link');
+          navLinks.forEach(link => {
+            link.addEventListener('click', function() {
+              mainNav.classList.remove('active');
+              navbarToggle.classList.remove('active');
+            });
+          });
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,402 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/station_statistique.css'%}" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+
+<div class="header">
+    <div class="header-container">
+        <div class="header-content">
+            <h1 class="header-title">{{ station.nom }} - Statistiques</h1>
+            <p class="header-subtitle">{{ station.adresse }}</p>
+            <div class="header-meta">
+                <span class="meta-item"><i class="fas fa-calendar"></i> Période: {{ period_label }}</span>
+                <span class="meta-item"><i class="fas fa-sync"></i> Dernière mise à jour: {{ now|date:"d/m/Y H:i" }}</span>
+            </div>
+        </div>
+        <div class="station-status {% if station.disponibilite %}available{% else %}occupied{% endif %}">
+            {% if station.disponibilite %}Disponible{% else %}Occupée{% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="main-content">
+    <!-- Remplacer le bouton de retour actuel par celui-ci -->
+    <div class="controls-row">
+        <a href="{% url 'stations:station_List_Fournisseur' username=station.username.username %}" class="back-button-animated">
+            <div class="back-button-bg">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" height="25px" width="25px">
+                    <path d="m237.248 512 265.408 265.344a32 32 0 0 1-45.312 45.312l-288-288a32 32 0 0 1 0-45.312l288-288a32 32 0 1 1 45.312 45.312L237.248 512z" fill="#ffffff"></path>
+                </svg>
+            </div>
+            <p class="back-button-text">Retour aux stations</p>
+        </a>
+        
+        <div class="period-selector">
+            <label for="period-select">Période :</label>
+            <select id="period-select" class="period-select">
+                <option value="day" {% if period == 'day' %}selected{% endif %}>Jour</option>
+                <option value="week" {% if period == 'week' %}selected{% endif %}>Semaine</option>
+                <option value="month" {% if period == 'month' or not period %}selected{% endif %}>Mois</option>
+                <option value="quarter" {% if period == 'quarter' %}selected{% endif %}>3 Mois</option>
+                <option value="year" {% if period == 'year' %}selected{% endif %}>Année</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Cartes KPI -->
+    <div class="kpi-row">
+        <div class="kpi-card">
+            <div class="kpi-icon">⚡</div>
+            <div class="kpi-value">{{ total_energy|floatformat:"0" }} kWh</div>
+            <p class="kpi-label">Énergie Totale</p>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-icon">🇲🇦</div>
+            <div class="kpi-value">{{ total_revenue|floatformat:"2" }} DH</div>
+            <p class="kpi-label">Revenu Total</p>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-icon">🔌</div>
+            <div class="kpi-value">{{ total_sessions }}</div>
+            <p class="kpi-label">Sessions</p>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-icon">⏱️</div>
+            <div class="kpi-value">{{ avg_duration }} min</div>
+            <p class="kpi-label">Durée Moyenne</p>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-icon">📈</div>
+            <div class="kpi-value">{{ uptime_pct }}%</div>
+            <p class="kpi-label">Disponibilité</p>
+        </div>
+    </div>
+
+    <!-- Graphiques -->
+    <!-- Remplacer la section des graphiques par celle-ci -->
+    <div class="charts-container">
+        <div class="chart-item neumorphic-card">
+            <div class="chart-title">
+                <span class="chart-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                    </svg>
+                </span>
+                <p class="title-text">Activité Quotidienne</p>
+            </div>
+            <div class="chart-data">
+                <div class="chart-wrapper">
+                    <canvas id="dailyActivityChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="chart-item neumorphic-card">
+            <div class="chart-title">
+                <span class="chart-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                        <line x1="8" y1="21" x2="16" y2="21"></line>
+                        <line x1="12" y1="17" x2="12" y2="21"></line>
+                    </svg>
+                </span>
+                <p class="title-text">Répartition des Revenus</p>
+            </div>
+            <div class="chart-data">
+                <div class="chart-wrapper">
+                    <canvas id="revenueChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="chart-item neumorphic-card">
+            <div class="chart-title">
+                <span class="chart-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                </span>
+                <p class="title-text">Répartition par Heure</p>
+            </div>
+            <div class="chart-data">
+                <div class="chart-wrapper">
+                    <canvas id="hourlyDistributionChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="chart-item neumorphic-card">
+            <div class="chart-title">
+                <span class="chart-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                </span>
+                <p class="title-text">Répartition par Jour</p>
+            </div>
+            <div class="chart-data">
+                <div class="chart-wrapper">
+                    <canvas id="weekdayDistributionChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Dernières réservations -->
+    <div class="table-container">
+        <h3>Dernières Réservations</h3>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Date</th>
+                    <th>Durée</th>
+                    <th>Énergie</th>
+                    <th>Montant</th>
+                    <th>Utilisateur</th> <!-- Renommé -->
+                </tr>
+            </thead>
+            <tbody>
+                {% for res in recent_reservations %}
+                <tr>
+                    <td>{{ res.get_formatted_id }}</td>
+                    <td>{{ res.time_start|date:"d/m/Y H:i" }}</td>
+                    <td>{{ res.duration|floatformat }}h</td>
+                    <td>{{ res.power|floatformat }} kWh</td>
+                    <td>{{ res.price|floatformat:"2" }} DH</td>
+                    <td>{{ res.username }}</td> <!-- Affiche le nom d'utilisateur -->
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Données des graphiques
+    const chartData = {
+        days: JSON.parse('{{ chart_data.days|safe }}'),
+        sessions: JSON.parse('{{ chart_data.sessions|safe }}'),
+        energy: JSON.parse('{{ chart_data.energy|safe }}'),
+        revenue: JSON.parse('{{ chart_data.revenue|safe }}'),
+        hours: JSON.parse('{{ chart_data.hours|safe }}'),
+        hourly_counts: JSON.parse('{{ chart_data.hourly_counts|safe }}'),
+        weekdays: JSON.parse('{{ chart_data.weekdays|safe }}'),
+        weekday_counts: JSON.parse('{{ chart_data.weekday_counts|safe }}')
+    };
+
+    // Options communes pour tous les graphiques
+    const commonOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'top',
+                labels: {
+                    boxWidth: 12,
+                    padding: 10
+                }
+            }
+        }
+    };
+
+    // Graphique d'activité quotidienne
+    new Chart(document.getElementById('dailyActivityChart'), {
+        type: 'line',
+        data: {
+            labels: chartData.days,
+            datasets: [{
+                label: 'Sessions',
+                data: chartData.sessions,
+                borderColor: '#16a34a',
+                tension: 0.4
+            }, {
+                label: 'Énergie (kWh)',
+                data: chartData.energy,
+                borderColor: '#3b82f6',
+                tension: 0.4
+            }]
+        },
+        options: {
+            ...commonOptions,
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+
+    // Graphique des revenus
+    new Chart(document.getElementById('revenueChart'), {
+        type: 'bar',
+        data: {
+            labels: chartData.days,
+            datasets: [{
+                label: 'Revenus (DH)',
+                data: chartData.revenue,
+                backgroundColor: '#16a34a77'
+            }]
+        },
+        options: {
+            ...commonOptions,
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+
+    // Graphique de répartition par heure
+    new Chart(document.getElementById('hourlyDistributionChart'), {
+        type: 'bar',
+        data: {
+            labels: Array.isArray(chartData.hours) ? chartData.hours.map(hour => `${hour}h`) : Array.from({length: 24}, (_, i) => `${i}h`),
+            datasets: [{
+                label: 'Nombre de sessions',
+                data: Array.isArray(chartData.hourly_counts) ? chartData.hourly_counts : Array(24).fill(0),
+                backgroundColor: '#3b82f6aa',
+                borderColor: '#3b82f6',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            ...commonOptions,
+            scales: {
+                y: { 
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Nombre de sessions'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Heure de la journée'
+                    }
+                }
+            }
+        }
+    });
+
+    // Graphique de répartition par jour de la semaine
+    new Chart(document.getElementById('weekdayDistributionChart'), {
+        type: 'bar',
+        data: {
+            labels: Array.isArray(chartData.weekdays) ? chartData.weekdays : ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'],
+            datasets: [{
+                label: 'Nombre de sessions',
+                data: Array.isArray(chartData.weekday_counts) ? chartData.weekday_counts : Array(7).fill(0),
+                backgroundColor: '#16a34aaa',
+                borderColor: '#16a34a',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            ...commonOptions,
+            scales: {
+                y: { 
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Nombre de sessions'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Jour de la semaine'
+                    }
+                }
+            }
+        }
+    });
+
+    // Actualisation automatique toutes les 5 minutes
+    setTimeout(() => {
+        window.location.reload();
+    }, 300000);
+    // Gestion du changement de période
+    document.getElementById('period-select').addEventListener('change', function() {
+        const period = this.value;
+        const currentUrl = new URL(window.location.href);
+        currentUrl.searchParams.set('period', period);
+        window.location.href = currentUrl.toString();
+    });
+</script>
+
+<style>
+    .header { background: #f8f9fa; padding: 2rem; margin-bottom: 2rem; }
+    .header-container { display: flex; justify-content: space-between; align-items: center; }
+    .station-status { padding: 0.5rem 1rem; border-radius: 20px; font-weight: bold; }
+    .station-status.available { background: #d1fae5; color: #065f46; }
+    .station-status.occupied { background: #fee2e2; color: #991b1b; }
+    .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+    .kpi-card { background: white; padding: 1.5rem; border-radius: 12px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .kpi-value { font-size: 2rem; font-weight: bold; margin: 0.5rem 0; }
+    .kpi-label { color: #6b7280; margin: 0; }
+    .kpi-label { color: #6b7280; margin: 0; }
+    
+    /* Nouvelle structure de graphiques */
+    .charts-container {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .chart-item {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        min-width: 0; /* Permet aux éléments de rétrécir en dessous de leur largeur de contenu */
+    }
+    
+    .chart-wrapper {
+        position: relative;
+        height: 300px;
+        width: 100%;
+    }
+    
+    .chart-header {
+        margin-bottom: 1rem;
+    }
+    
+    /* Table styles */
+    .data-table { width: 100%; border-collapse: collapse; background: white; }
+    .data-table th, .data-table td { padding: 1rem; text-align: left; border-bottom: 1px solid #e5e7eb; }
+    .status-badge { padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.875rem; }
+    .status-badge.available { background: #d1fae5; color: #065f46; }
+    .status-badge.pending { background: #fef3c7; color: #92400e; }
+    
+    /* Controls */
+    .back-button { display: inline-flex; align-items: center; gap: 0.5rem; color: #3b82f6; }
+    .controls-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+    .period-selector { display: flex; align-items: center; gap: 0.5rem; }
+    .period-select { padding: 0.5rem 1rem; border-radius: 0.5rem; border: 1px solid #e5e7eb; background-color: white; font-size: 0.875rem; }
+    .period-select:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3); }
+    
+    /* Table container */
+    .table-container {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+        overflow-x: auto;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .charts-container {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    @media (max-width: 640px) {
+        .header-container { flex-direction: column; align-items: flex-start; gap: 1rem; }
+        .station-status { align-self: flex-start; }
+        .controls-row { flex-direction: column; align-items: flex-start; }
+    }
+</style>

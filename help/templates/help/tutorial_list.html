@@ -1,0 +1,69 @@
+{% extends 'help/help_base.html' %} {% block help_content %}
+<div class="help-header">
+  <h1 class="help-title">Tutoriels Interactifs</h1>
+  <p class="help-description">
+    Explorez nos guides pas à pas pour maîtriser toutes les fonctionnalités de
+    notre plateforme.
+  </p>
+</div>
+
+<div class="tutorial-search">
+  <input
+    type="text"
+    id="tutorial-search-input"
+    placeholder="Rechercher un guide spécifique..."
+    class="search-input"
+  />
+</div>
+
+<div class="tutorial-grid">
+  {% for tutorial in tutorials %}
+  <div
+    class="tutorial-card"
+    data-title="{{ tutorial.title }}"
+    data-description="{{ tutorial.description }}"
+  >
+    <div class="tutorial-image">
+      {% if tutorial.image %}
+      <img src="{{ tutorial.image.url }}" alt="{{ tutorial.title }}" />
+      {% else %}
+      <div class="placeholder-image">
+        <i class="fas fa-book"></i>
+      </div>
+      {% endif %}
+    </div>
+    <div class="tutorial-content">
+      <h2 class="tutorial-title">{{ tutorial.title }}</h2>
+      <p class="tutorial-description">{{ tutorial.description }}</p>
+      <a
+        href="{% url 'help:tutorial_detail' tutorial.id %}"
+        class="tutorial-link"
+        >Voir le tutoriel</a
+      >
+    </div>
+  </div>
+  {% empty %}
+  <p class="no-items">Aucun tutoriel disponible pour le moment.</p>
+  {% endfor %}
+</div>
+
+<script>
+  document
+    .getElementById("tutorial-search-input")
+    .addEventListener("keyup", function () {
+      const searchTerm = this.value.toLowerCase();
+      const tutorialCards = document.querySelectorAll(".tutorial-card");
+
+      tutorialCards.forEach((card) => {
+        const title = card.getAttribute("data-title").toLowerCase();
+        const description = card.getAttribute("data-description").toLowerCase();
+
+        if (title.includes(searchTerm) || description.includes(searchTerm)) {
+          card.style.display = "flex";
+        } else {
+          card.style.display = "none";
+        }
+      });
+    });
+</script>
+{% endblock %}

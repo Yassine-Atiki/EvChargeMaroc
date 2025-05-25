@@ -1,0 +1,69 @@
+{% extends 'help/help_base.html' %} {% load static %} {% block help_content %}
+<div class="help-header">
+  <h1 class="help-title">Administration des tickets</h1>
+  <p class="help-description">
+    Gérez les demandes d'assistance des utilisateurs.
+  </p>
+</div>
+
+<div class="admin-filters">
+  <div class="filter-group">
+    <label for="status-filter">Filtrer par statut:</label>
+    <select id="status-filter" class="form-select">
+      <option value="all">Tous</option>
+      <option value="new">Nouveau</option>
+      <option value="in_progress">En cours</option>
+      <option value="resolved">Résolu</option>
+      <option value="closed">Fermé</option>
+    </select>
+  </div>
+</div>
+
+<div class="tickets-list admin-tickets">
+  {% if tickets %}
+  <div class="ticket-list">
+    {% for ticket in tickets %}
+    <div class="ticket-item" data-status="{{ ticket.status }}">
+      <div class="ticket-info">
+        <h3 class="ticket-subject">{{ ticket.subject }}</h3>
+        <div class="ticket-meta">
+          <span class="ticket-user">{{ ticket.user.username }}</span>
+          <span class="ticket-date"
+            >{{ ticket.created_at|date:"d/m/Y H:i" }}</span
+          >
+          <span class="status-badge status-{{ ticket.status }}"
+            >{{ ticket.get_status_display }}</span
+          >
+        </div>
+      </div>
+      <a
+        href="{% url 'help:admin_ticket_detail' ticket.id %}"
+        class="view-ticket-btn"
+        >Gérer</a
+      >
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="no-items">Aucun ticket n'a été créé.</p>
+  {% endif %}
+</div>
+
+<script>
+  // Script pour filtrer les tickets par statut
+  document
+    .getElementById("status-filter")
+    .addEventListener("change", function () {
+      const status = this.value;
+      const tickets = document.querySelectorAll(".ticket-item");
+
+      tickets.forEach((ticket) => {
+        if (status === "all" || ticket.dataset.status === status) {
+          ticket.style.display = "flex";
+        } else {
+          ticket.style.display = "none";
+        }
+      });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,258 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+{% block content %}
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'css/list_reservation.css'%}" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<div class="page-container">
+  <main class="main-content">
+    <section class="hero-section">
+      <h1 class="page-title">Mes réservations</h1>
+      <p class="page-description">
+        Consultez et gérez vos réservations de bornes de recharge.
+      </p>
+      
+      <!-- Ajout de la barre de recherche et filtres -->
+      <div class="search-controls">
+        <div class="search-input">
+          <i class="fas fa-search"></i>
+          <input type="text" id="search-reservation" placeholder="Rechercher par station ou adresse...">
+        </div>
+      </div>
+      
+      <!-- Onglets pour basculer entre les réservations -->
+      <div class="view-tabs">
+        <button class="tab-button active" data-target="upcoming">À venir</button>
+        <button class="tab-button" data-target="past">Passées</button>
+      </div>
+    </section>
+
+    <!-- Réservations à venir -->
+    <section class="stations-list" id="upcoming-reservations">
+      <div class="list-header">
+        <h2 class="list-title">Réservations à venir</h2>
+        <div class="sort-dropdown">
+          <button class="sort-button">
+            <i class="fas fa-sort"></i>
+            <span>Trier par</span>
+          </button>
+          <div class="sort-options">
+            <a href="#" data-sort="date-asc">Date (plus proche)</a>
+            <a href="#" data-sort="date-desc">Date (plus éloignée)</a>
+            <a href="#" data-sort="price-asc">Prix (croissant)</a>
+            <a href="#" data-sort="price-desc">Prix (décroissant)</a>
+          </div>
+        </div>
+      </div>
+      
+      {% if upcoming_reservations %}
+        <div class="reservation-grid">
+          {% for reservation in upcoming_reservations %}
+            <article class="reservation-card" data-station="{{ reservation.ID_Station.nom }}" data-address="{{ reservation.ID_Station.adresse }}">
+              <div class="card-header">
+                <h3 class="station-name">{{ reservation.ID_Station.nom }}</h3>
+                <span class="status-badge available">À venir</span>
+              </div>
+              <div class="card-body">
+                <div class="reservation-info">
+                  <div class="info-row">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>{{ reservation.ID_Station.adresse }}</span>
+                  </div>
+                  <div class="info-row">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>{{ reservation.time_start|date:"d/m/Y" }}</span>
+                  </div>
+                  <div class="info-row">
+                    <i class="fas fa-clock"></i>
+                    <span>{{ reservation.time_start|time:"H:i" }}</span>
+                  </div>
+                  <div class="info-row">
+                    <i class="fas fa-hourglass-half"></i>
+                    <span>{{ reservation.duration }} heure(s)</span>
+                  </div>
+                  <div class="info-row">
+                    <i class="fas fa-bolt"></i>
+                    <span>{{ reservation.power }} kW</span>
+                  </div>
+                </div>
+                <div class="price-tag">
+                  <span>{{ reservation.price }} DH</span>
+                </div>
+              </div>
+              <div class="card-footer">
+                <a href="{% url 'stations:reservation_confirmation' reservation.ID_Reservation %}" class="btn-primary">
+                  <i class="fas fa-eye"></i> Voir détails
+                </a>
+                <button class="btn-secondary add-calendar" data-id="{{ reservation.ID_Reservation }}">
+                  <i class="fas fa-calendar-plus"></i>
+                </button>
+              </div>
+            </article>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty-state">
+          <i class="fas fa-calendar-times"></i>
+          <p class="no-reservations">Vous n'avez pas de réservations à venir.</p>
+          <a href="{% url 'stations:station_List_ProprietaireVE' %}" class="btn-primary">Réserver une borne</a>
+        </div>
+      {% endif %}
+    </section>
+
+    <!-- Réservations passées -->
+    <section class="stations-list hidden" id="past-reservations">
+      <div class="list-header">
+        <h2 class="list-title">Réservations passées</h2>
+        <div class="sort-dropdown">
+          <button class="sort-button">
+            <i class="fas fa-sort"></i>
+            <span>Trier par</span>
+          </button>
+          <div class="sort-options">
+            <a href="#" data-sort="date-desc">Date (plus récente)</a>
+            <a href="#" data-sort="date-asc">Date (plus ancienne)</a>
+            <a href="#" data-sort="price-asc">Prix (croissant)</a>
+            <a href="#" data-sort="price-desc">Prix (décroissant)</a>
+          </div>
+        </div>
+      </div>
+      
+      {% if past_reservations %}
+        <div class="reservation-grid">
+          {% for reservation in past_reservations %}
+            <article class="reservation-card" data-station="{{ reservation.ID_Station.nom }}" data-address="{{ reservation.ID_Station.adresse }}">
+              <div class="card-header">
+                <h3 class="station-name">{{ reservation.ID_Station.nom }}</h3>
+                <span class="status-badge occupied">Terminée</span>
+              </div>
+              <div class="card-body">
+                <div class="reservation-info">
+                  <div class="info-row">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>{{ reservation.ID_Station.adresse }}</span>
+                  </div>
+                  <div class="info-row">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>{{ reservation.time_start|date:"d/m/Y" }}</span>
+                  </div>
+                  <div class="info-row">
+                    <i class="fas fa-clock"></i>
+                    <span>{{ reservation.time_start|time:"H:i" }}</span>
+                  </div>
+                  <div class="info-row">
+                    <i class="fas fa-hourglass-half"></i>
+                    <span>{{ reservation.duration }} heure(s)</span>
+                  </div>
+                  <div class="info-row">
+                    <i class="fas fa-bolt"></i>
+                    <span>{{ reservation.power }} kW</span>
+                  </div>
+                </div>
+                <div class="price-tag">
+                  <span>{{ reservation.price }} DH</span>
+                </div>
+              </div>
+              <div class="card-footer">
+                <a href="{% url 'stations:reservation_confirmation' reservation.ID_Reservation %}" class="btn-primary">
+                  <i class="fas fa-eye"></i> Voir détails
+                </a>
+              </div>
+            </article>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty-state">
+          <i class="fas fa-history"></i>
+          <p class="no-reservations">Vous n'avez pas de réservations passées.</p>
+        </div>
+      {% endif %}
+    </section>
+  </main>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  // Gestion des onglets
+  const tabButtons = document.querySelectorAll('.tab-button');
+  const reservationSections = document.querySelectorAll('.stations-list');
+  
+  tabButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      // Retirer la classe active de tous les boutons
+      tabButtons.forEach(btn => btn.classList.remove('active'));
+      // Ajouter la classe active au bouton cliqué
+      this.classList.add('active');
+      
+      // Cacher toutes les sections
+      reservationSections.forEach(section => section.classList.add('hidden'));
+      
+      // Afficher la section correspondante
+      const targetId = this.getAttribute('data-target') + '-reservations';
+      document.getElementById(targetId).classList.remove('hidden');
+      
+      // Appliquer la recherche sur le nouvel onglet actif
+      filterBySearch();
+    });
+  });
+  
+  // Recherche de réservations
+  const searchInput = document.getElementById('search-reservation');
+  
+  function filterBySearch() {
+    const searchTerm = searchInput.value.toLowerCase();
+    
+    // Déterminer quelle section est active
+    const activeSection = document.querySelector('.stations-list:not(.hidden)');
+    if (!activeSection) return;
+    
+    const reservationCards = activeSection.querySelectorAll('.reservation-card');
+    
+    reservationCards.forEach(card => {
+      const stationName = card.getAttribute('data-station').toLowerCase();
+      const stationAddress = card.getAttribute('data-address').toLowerCase();
+      
+      if (searchTerm && !stationName.includes(searchTerm) && !stationAddress.includes(searchTerm)) {
+        card.style.display = 'none';
+      } else {
+        card.style.display = 'flex';
+      }
+    });
+  }
+  
+  // Attacher l'événement de recherche
+  if (searchInput) {
+    searchInput.addEventListener('input', filterBySearch);
+  }
+  
+  // Gestion des menus déroulants de tri
+  const sortButtons = document.querySelectorAll('.sort-button');
+  sortButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      const dropdown = this.nextElementSibling;
+      dropdown.classList.toggle('show');
+    });
+  });
+  
+  // Fermer les menus déroulants quand on clique ailleurs
+  document.addEventListener('click', function(event) {
+    if (!event.target.matches('.sort-button') && !event.target.closest('.sort-button')) {
+      const dropdowns = document.querySelectorAll('.sort-options');
+      dropdowns.forEach(dropdown => dropdown.classList.remove('show'));
+    }
+  });
+  
+  // Ajouter au calendrier
+  const calendarButtons = document.querySelectorAll('.add-calendar');
+  calendarButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      const reservationId = this.getAttribute('data-id');
+      alert('Fonctionnalité d\'ajout au calendrier à implémenter pour la réservation ' + reservationId);
+    });
+  });
+});
+</script>
+{% endblock content %}

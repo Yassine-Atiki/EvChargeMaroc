@@ -1,0 +1,27 @@
+{% extends 'help/help_base.html' %}
+
+{% block help_content %}
+<div class="tutorial-header">
+    <a href="{% url 'help:tutorial_list' %}" class="back-link"><i class="fas fa-arrow-left"></i> Retour aux tutoriels</a>
+    <h1 class="tutorial-title">{{ tutorial.title }}</h1>
+    <p class="tutorial-meta">Mis à jour le {{ tutorial.updated_at|date:"d/m/Y" }}</p>
+</div>
+
+<div class="tutorial-content">
+    {% if tutorial.image %}
+    <div class="tutorial-featured-image">
+        <img src="{{ tutorial.image.url }}" alt="{{ tutorial.title }}">
+    </div>
+    {% endif %}
+    
+    {% if tutorial.video_url %}
+    <div class="tutorial-video">
+        <iframe width="100%" height="400" src="{{ tutorial.video_url }}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
+    {% endif %}
+    
+    <div class="tutorial-text">
+        {{ tutorial.content|linebreaks }}
+    </div>
+</div>
+{% endblock %}

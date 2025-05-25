@@ -1,0 +1,35 @@
+{% extends 'help/help_base.html' %}
+
+{% block help_content %}
+<div class="help-header">
+    <h1 class="help-title">Créer un ticket de support</h1>
+    <p class="help-description">Décrivez votre problème ou votre question, et notre équipe vous répondra dans les plus brefs délais.</p>
+</div>
+
+<div class="ticket-form-container">
+    <form method="post" class="ticket-form">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="id_subject" class="form-label">Sujet</label>
+            {{ form.subject }}
+            {% if form.subject.errors %}
+            <div class="form-error">{{ form.subject.errors }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            <label for="id_message" class="form-label">Message</label>
+            {{ form.message }}
+            {% if form.message.errors %}
+            <div class="form-error">{{ form.message.errors }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="form-actions">
+            <a href="{% url 'help:support_home' %}" class="btn-secondary">Annuler</a>
+            <button type="submit" class="btn-primary">Envoyer</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

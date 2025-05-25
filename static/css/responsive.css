@@ -1,0 +1,307 @@
+/* Responsive Styles Globaux */
+
+/* Variables pour les breakpoints */
+:root {
+  --breakpoint-xs: 480px;    /* Téléphones extra small */
+  --breakpoint-sm: 640px;    /* Téléphones */
+  --breakpoint-md: 768px;    /* Tablettes */
+  --breakpoint-lg: 991px;    /* Tablettes grandes et petits ordinateurs */
+  --breakpoint-xl: 1200px;   /* Ordinateurs */
+  --breakpoint-xxl: 1400px;  /* Grands écrans */
+
+  /* Marges et padding responsives */
+  --container-padding-mobile: 16px;
+  --container-padding-tablet: 24px;
+  --container-padding-desktop: 32px;
+
+  /* Tailles de police responsives */
+  --font-size-small-mobile: 12px;
+  --font-size-base-mobile: 14px;
+  --font-size-large-mobile: 18px;
+  --font-size-title-mobile: 24px;
+
+  --font-size-small-tablet: 13px;
+  --font-size-base-tablet: 15px;
+  --font-size-large-tablet: 20px;
+  --font-size-title-tablet: 28px;
+
+  --font-size-small: 14px;
+  --font-size-base: 16px;
+  --font-size-large: 22px;
+  --font-size-title: 36px;
+}
+
+/* Base Responsive */
+html {
+  box-sizing: border-box;
+  font-size: 16px;
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  min-height: 100vh;
+  width: 100%;
+}
+
+/* Images responsives */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Classes utilitaires responsives */
+.container {
+  width: 100%;
+  padding-left: var(--container-padding-mobile);
+  padding-right: var(--container-padding-mobile);
+  margin: 0 auto;
+}
+
+.hide-xs {
+  display: none !important;
+}
+
+/* Pour les mobiles en mode portrait (< 640px) */
+@media (max-width: 639px) {
+  .hide-sm-down {
+    display: none !important;
+  }
+  
+  .show-sm-down {
+    display: block !important;
+  }
+  
+  /* Ajustements de la navigation */
+  .main-header {
+    height: 60px;
+  }
+  
+  /* Ajustements des formulaires */
+  input, select, textarea {
+    font-size: 16px; /* Éviter le zoom sur iOS */
+  }
+  
+  /* Ajustements des boutons */
+  .btn, button {
+    padding: 8px 16px;
+    font-size: var(--font-size-base-mobile);
+  }
+}
+
+/* Pour les mobiles en mode paysage et petites tablettes (640px - 767px) */
+@media (min-width: 640px) and (max-width: 767px) {
+  .container {
+    padding-left: var(--container-padding-tablet);
+    padding-right: var(--container-padding-tablet);
+  }
+  
+  .hide-sm {
+    display: none !important;
+  }
+  
+  .show-sm {
+    display: block !important;
+  }
+}
+
+/* Pour les tablettes (768px - 990px) */
+@media (min-width: 768px) and (max-width: 990px) {
+  .container {
+    padding-left: var(--container-padding-tablet);
+    padding-right: var(--container-padding-tablet);
+    max-width: 720px;
+  }
+  
+  .hide-md {
+    display: none !important;
+  }
+  
+  .show-md {
+    display: block !important;
+  }
+  
+  .hide-xs {
+    display: initial !important;
+  }
+}
+
+/* Pour les petits écrans d'ordinateurs (991px - 1199px) */
+@media (min-width: 991px) and (max-width: 1199px) {
+  .container {
+    padding-left: var(--container-padding-desktop);
+    padding-right: var(--container-padding-desktop);
+    max-width: 960px;
+  }
+  
+  .hide-lg {
+    display: none !important;
+  }
+  
+  .show-lg {
+    display: block !important;
+  }
+  
+  .hide-xs {
+    display: initial !important;
+  }
+}
+
+/* Pour les grands écrans (1200px et plus) */
+@media (min-width: 1200px) {
+  .container {
+    max-width: 1140px;
+  }
+  
+  .hide-xl {
+    display: none !important;
+  }
+  
+  .show-xl {
+    display: block !important;
+  }
+  
+  .hide-xs {
+    display: initial !important;
+  }
+}
+
+/* Pour les très grands écrans (1400px et plus) */
+@media (min-width: 1400px) {
+  .container {
+    max-width: 1320px;
+  }
+}
+
+/* Flexbox Responsive */
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  margin-left: -15px;
+  margin-right: -15px;
+}
+
+.col {
+  position: relative;
+  width: 100%;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+/* Colonnes responsives */
+@media (min-width: 640px) {
+  .col-sm-6 {
+    flex: 0 0 50%;
+    max-width: 50%;
+  }
+  
+  .col-sm-12 {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+}
+
+@media (min-width: 768px) {
+  .col-md-4 {
+    flex: 0 0 33.333333%;
+    max-width: 33.333333%;
+  }
+  
+  .col-md-6 {
+    flex: 0 0 50%;
+    max-width: 50%;
+  }
+  
+  .col-md-8 {
+    flex: 0 0 66.666667%;
+    max-width: 66.666667%;
+  }
+}
+
+@media (min-width: 991px) {
+  .col-lg-3 {
+    flex: 0 0 25%;
+    max-width: 25%;
+  }
+  
+  .col-lg-4 {
+    flex: 0 0 33.333333%;
+    max-width: 33.333333%;
+  }
+  
+  .col-lg-6 {
+    flex: 0 0 50%;
+    max-width: 50%;
+  }
+  
+  .col-lg-8 {
+    flex: 0 0 66.666667%;
+    max-width: 66.666667%;
+  }
+}
+
+/* Styles responsifs pour les tableaux */
+@media (max-width: 767px) {
+  .table-responsive {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Menu burger pour mobile */
+.navbar-toggle {
+  display: none;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 10px;
+}
+
+.navbar-toggle span {
+  display: block;
+  width: 25px;
+  height: 3px;
+  background-color: #333;
+  margin: 5px 0;
+  transition: all 0.3s ease;
+}
+
+@media (max-width: 767px) {
+  .navbar-toggle {
+    display: block;
+  }
+  
+  .main-nav {
+    position: fixed;
+    top: 60px;
+    left: 0;
+    right: 0;
+    background-color: #fff;
+    height: 0;
+    overflow: hidden;
+    transition: height 0.3s ease;
+    flex-direction: column;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    z-index: 99;
+  }
+  
+  .main-nav.active {
+    height: calc(100vh - 60px);
+    overflow-y: auto;
+  }
+  
+  .main-nav .nav-link {
+    display: block;
+    padding: 15px 20px;
+    border-bottom: 1px solid #eee;
+  }
+} 

@@ -1,0 +1,369 @@
+{% extends 'base.html' %} {% load custom_filters %} {% block content %}
+<!DOCTYPE html>
+<html lang="fr">
+  {% load static %}
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EV Charge Maroc</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="{% static 'css/inscription.css' %}" />
+  </head>
+  <body>
+    <main class="main-content">
+      <section class="registration-card">
+        <div class="card-header">
+          <img
+            src="https://cdn.builder.io/api/v1/image/assets/TEMP/ebf4b47c6a582bb1f614b2a4ae44131577e371ac"
+            alt="EV Charge Maroc Logo"
+            class="card-logo"
+          />
+          <h2 class="card-title">EV Charge Maroc</h2>
+        </div>
+
+        <h3 class="registration-title">Créer un compte</h3>
+        <p class="registration-description">
+          Inscrivez-vous pour accéder à toutes les fonctionnalités de EV Maroc
+        </p>
+        
+        <!-- Bloc de messages d'erreur globaux -->
+        {% if messages %}
+        <div class="error-container">
+          {% for message in messages %}
+          <div class="error-message {% if message.tags %}{{ message.tags }}{% endif %}">
+            {{ message }}
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+        
+        <!-- Bloc d'erreur de formulaire -->
+        {% if form.non_field_errors %}
+        <div class="error-container">
+          {% for error in form.non_field_errors %}
+          <div class="error-message">{{ error }}</div>
+          {% endfor %}
+        </div>
+        {% endif %}
+        
+        <form
+          id="register-form"
+          action="{% url 'users:inscription' %}"
+          method="post"
+          class="registration-form"
+        >
+          {% csrf_token %}
+          <div class="account-type-selector">
+            <h4 class="selector-title">Type de compte</h4>
+            <div class="toggle-container">
+              <input type="radio" id="proprietaire" name="user_type" value="proprietaire" checked class="toggle-input" />
+              <label for="proprietaire" class="toggle-label proprietaire-label">
+                <div class="toggle-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 9h14M8 4h8l2 3.5L12 10 6 7.5 8 4z"></path>
+                    <path d="M7 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"></path>
+                    <path d="M17 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"></path>
+                    <path d="M5 9v4M19 9v4"></path>
+                  </svg>
+                </div>
+                <span>Propriétaire de véhicule</span>
+              </label>
+              
+              <input type="radio" id="fournisseur" name="user_type" value="fournisseur" class="toggle-input" />
+              <label for="fournisseur" class="toggle-label fournisseur-label">
+                <div class="toggle-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="6" y="3" width="12" height="18" rx="2"></rect>
+                    <line x1="12" y1="7" x2="12" y2="9"></line>
+                    <line x1="12" y1="14" x2="12" y2="16"></line>
+                    <path d="M7 20l3-3h4l3 3"></path>
+                  </svg>
+                </div>
+                <span>Fournisseur de stations</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="first_name" class="form-label">first name</label>
+              <input
+                type="text"
+                name="first_name"
+                id="first_name"
+                required
+                class="form-input {% if form.first_name.errors %}error{% endif %}"
+                {% if form.first_name.value %}value="{{ form.first_name.value }}"{% endif %}
+              />
+              {% if form.first_name.errors %}
+              <div class="field-error">
+                {% for error in form.first_name.errors %}
+                <p>{{ error }}</p>
+                {% endfor %}
+              </div>
+              {% endif %}
+            </div>
+            <div class="form-group">
+              <label for="last_name" class="form-label">last name</label>
+              <input
+                type="text"
+                name="last_name"
+                id="last_name"
+                class="form-input {% if form.last_name.errors %}error{% endif %}"
+                {% if form.last_name.value %}value="{{ form.last_name.value }}"{% endif %}
+              />
+              {% if form.last_name.errors %}
+              <div class="field-error">
+                {% for error in form.last_name.errors %}
+                <p>{{ error }}</p>
+                {% endfor %}
+              </div>
+              {% endif %}
+            </div>
+            <div class="form-group">
+              <label for="username" class="form-label">Username</label>
+              <input
+                type="text"
+                name="username"
+                id="username"
+                required
+                class="form-input {% if form.username.errors %}error{% endif %}"
+                {% if form.username.value %}value="{{ form.username.value }}"{% endif %}
+              />
+              {% if form.username.errors %}
+              <div class="field-error">
+                {% for error in form.username.errors %}
+                <p>{{ error }}</p>
+                {% endfor %}
+              </div>
+              {% endif %}
+            </div>
+            <div class="form-group">
+              <label for="CIN" class="form-label"
+                >CIN (Carte d'Identité Nationale)</label
+              >
+              <input
+                type="text"
+                name="CIN"
+                id="CIN"
+                minlength="8"
+                maxlength="8"
+                required
+                class="form-input {% if form.CIN.errors %}error{% endif %}"
+                {% if form.CIN.value %}value="{{ form.CIN.value }}"{% endif %}
+              />
+              {% if form.CIN.errors %}
+              <div class="field-error">
+                {% for error in form.CIN.errors %}
+                <p>{{ error }}</p>
+                {% endfor %}
+              </div>
+              {% endif %}
+            </div>
+            <div class="form-group">
+              <label for="email" class="form-label">Email</label>
+              <input
+                type="email"
+                name="email"
+                id="email"
+                required
+                class="form-input {% if form.email.errors %}error{% endif %}"
+                {% if form.email.value %}value="{{ form.email.value }}"{% endif %}
+              />
+              {% if form.email.errors %}
+              <div class="field-error">
+                {% for error in form.email.errors %}
+                <p>{{ error }}</p>
+                {% endfor %}
+              </div>
+              {% endif %}
+            </div>
+            <div class="form-group">
+              <label for="phone_number" class="form-label">Téléphone</label>
+              <input
+                type="tel"
+                name="phone_number"
+                id="phone_number"
+                minlength="10"
+                maxlength="10"
+                required
+                class="form-input {% if form.phone_number.errors %}error{% endif %}"
+                {% if form.phone_number.value %}value="{{ form.phone_number.value }}"{% endif %}
+              />
+              {% if form.phone_number.errors %}
+              <div class="field-error">
+                {% for error in form.phone_number.errors %}
+                <p>{{ error }}</p>
+                {% endfor %}
+              </div>
+              {% endif %}
+            </div>
+            <div class="form-group">
+              <label for="password" class="form-label">Mot de passe</label>
+              <input
+                type="password"
+                name="password"
+                id="password"
+                minlength="8"
+                required
+                class="form-input {% if form.password.errors %}error{% endif %}"
+              />
+              {% if form.password.errors %}
+              <div class="field-error">
+                {% for error in form.password.errors %}
+                <p>{{ error }}</p>
+                {% endfor %}
+              </div>
+              {% endif %}
+            </div>
+            <div class="form-group">
+              <label for="password_confirmation" class="form-label"
+                >Confirmer le mot de passe</label
+              >
+              <input
+                type="password"
+                name="password_confirmation"
+                id="password_confirmation"
+                minlength="8"
+                required
+                class="form-input {% if form.password_confirmation.errors %}error{% endif %}"
+              />
+              {% if form.password_confirmation.errors %}
+              <div class="field-error">
+                {% for error in form.password_confirmation.errors %}
+                <p>{{ error }}</p>
+                {% endfor %}
+              </div>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="terms-container {% if form.terms.errors %}terms-error{% endif %}">
+            <input type="checkbox" id="terms" name="terms" class="terms-checkbox" required {% if form.terms.value %}checked{% endif %} />
+            <label for="terms" class="terms-label">
+              J'accepte les
+              <a href="{% url 'Home:terms_of_service' %}" class="terms-link">conditions d'utilisation</a>
+              et la
+              <a href="{% url 'Home:privacy_policy' %}" class="terms-link">politique de confidentialité</a>
+              *
+            </label>
+            {% if form.terms.errors %}
+            <div class="field-error">
+              {% for error in form.terms.errors %}
+              <p>{{ error }}</p>
+              {% endfor %}
+            </div>
+            {% endif %}
+          </div>
+
+          <button type="submit" class="submit-button">S'inscrire</button>
+          <a href="{% url 'users:login' %}"
+            ><p class="login-text">Vous avez déjà un compte?</p></a
+          >
+        </form>
+      </section>
+    </main>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const form = document.getElementById("register-form");
+        const password = document.getElementById("password");
+        const confirmPassword = document.getElementById(
+          "password_confirmation"
+        );
+        const errorContainer = document.createElement("div");
+        errorContainer.className = "error-container";
+        const errorMessage = document.createElement("div");
+        errorMessage.className = "error-message";
+        errorContainer.appendChild(errorMessage);
+
+        form.addEventListener("submit", function (event) {
+          if (password.value !== confirmPassword.value) {
+            event.preventDefault(); // Empêche l'envoi du formulaire
+            errorMessage.textContent = "Les mots de passe ne correspondent pas !";
+            
+            // Ajouter la classe d'erreur aux champs de mot de passe
+            password.classList.add("error");
+            confirmPassword.classList.add("error");
+            
+            // Afficher le message d'erreur
+            const existingError = form.querySelector(".error-container");
+            if (existingError) {
+              form.removeChild(existingError);
+            }
+            form.insertBefore(errorContainer, form.firstChild);
+            
+            // Faire défiler jusqu'au message d'erreur
+            errorContainer.scrollIntoView({ behavior: 'smooth' });
+          }
+        });
+      });
+    </script>
+    
+    <style>
+      /* Styles pour les messages d'erreur */
+      .error-container {
+          background-color: #fff5f5;
+          border-left: 4px solid #e53e3e;
+          border-radius: 4px;
+          padding: 12px 16px;
+          margin-bottom: 20px;
+          color: #c53030;
+          font-size: 14px;
+      }
+      
+      .error-message {
+          margin-bottom: 6px;
+      }
+      
+      .error-message:last-child {
+          margin-bottom: 0;
+      }
+      
+      .field-error {
+          color: #e53e3e;
+          font-size: 13px;
+          margin-top: 4px;
+      }
+      
+      .field-error p {
+          margin: 0;
+      }
+      
+      input.error {
+          border-color: #e53e3e !important;
+          border-width: 1px;
+          background-color: #fff5f5;
+      }
+      
+      .terms-error .terms-label {
+          color: #e53e3e;
+      }
+      
+      /* Style pour les messages de succès */
+      .success {
+          background-color: #f0fff4;
+          border-left: 4px solid #38a169;
+          color: #2f855a;
+      }
+      
+      /* Style pour les messages d'information */
+      .info {
+          background-color: #ebf8ff;
+          border-left: 4px solid #4299e1;
+          color: #3182ce;
+      }
+      
+      /* Style pour les messages d'avertissement */
+      .warning {
+          background-color: #fffaf0;
+          border-left: 4px solid #ed8936;
+          color: #dd6b20;
+      }
+    </style>
+  </body>
+</html>
+{% endblock content %}

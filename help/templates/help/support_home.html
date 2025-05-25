@@ -1,0 +1,48 @@
+{% extends 'help/help_base.html' %} {% block help_content %}
+<div class="help-header">
+  <h1 class="help-title">Support Personnalisé</h1>
+  <p class="help-description">
+    Notre équipe d'experts est à votre écoute pour résoudre vos problèmes
+    spécifiques et répondre à toutes vos questions.
+  </p>
+</div>
+
+<div class="support-container">
+  <div class="support-actions">
+    <a href="{% url 'help:create_ticket' %}" class="btn-primary"
+      ><i class="fas fa-plus"></i> Créer une nouvelle demande</a
+    >
+  </div>
+
+  <div class="tickets-list">
+    <h2 class="section-title">Mes demandes d'assistance</h2>
+
+    {% if tickets %}
+    <div class="ticket-list">
+      {% for ticket in tickets %}
+      <div class="ticket-item">
+        <div class="ticket-info">
+          <h3 class="ticket-subject">{{ ticket.subject }}</h3>
+          <div class="ticket-meta">
+            <span class="ticket-date"
+              >Créé le {{ ticket.created_at|date:"d/m/Y" }}</span
+            >
+            <span class="status-badge status-{{ ticket.status }}"
+              >{{ ticket.get_status_display }}</span
+            >
+          </div>
+        </div>
+        <a
+          href="{% url 'help:ticket_detail' ticket.id %}"
+          class="view-ticket-btn"
+          >Voir</a
+        >
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="no-items">Vous n'avez pas encore créé de demande d'assistance.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
